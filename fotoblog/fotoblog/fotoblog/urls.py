@@ -29,3 +29,9 @@ urlpatterns =  [
     path('login/',authentification.views.login_page, name='login')
     path('logout/',authentification.views.loogout_user, name='logout')
 ]
+
+
+import blog.views
+urlpatterns = [
+    path('home/', blog.views.home, name=home)
+]
