@@ -23,15 +23,26 @@ urlpatterns = [
 
 from django.contrib import admin
 from django.urls import path 
-import authentification.views 
+import authentication.views 
 urlpatterns =  [
     path('admin/', admin.site.urls),
-    path('login/',authentification.views.login_page, name='login')
-    path('logout/',authentification.views.loogout_user, name='logout')
+    path('login/',authentication.views.login_page, name='login'),
+    path('logout/',authentication.views.logout_user, name='logout')
 ]
 
 
 import blog.views
 urlpatterns = [
-    path('home/', blog.views.home, name=home)
+    path('home/', blog.views.home, name='home')
 ]
+
+# fotoblog/urls.py
+from django.conf import settings
+from django.conf.urls.static import static
+
+urlpatterns = [
+    ...
+    ]
+if settings.DEBUG:
+    urlpatterns += static(
+        settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

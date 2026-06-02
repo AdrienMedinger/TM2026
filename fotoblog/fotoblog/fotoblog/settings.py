@@ -143,7 +143,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            BASE_DIR.joinpath('templates'),· # <--- ajoutez cette ligne
+            BASE_DIR.joinpath('templates'), # <--- ajoutez cette ligne
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -157,3 +157,7 @@ TEMPLATES = [
     },
 ]
 ...
+
+# fotoblog/settings.py
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR.joinpath('media/')
