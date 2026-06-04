@@ -19,4 +19,4 @@ class variante_produit(models.Model) :
     stock = models.PositiveIntegerField(default=0)
     sku = models.CharField(max_length=64, unique=True)
     def __str__(self):
-        return f"{self.produit.nom} - {self.taille} - {self.couleeur} - {self.prix}Fr - {self.stock} em stock"
+        return f"{self.produit.nom} - {self.taille} - {self.couleeur} - {self.prix}Fr - {self.stock} en stock"
