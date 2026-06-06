@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.contrib.auth.models import AbstractUser
 class produit(models.Model) :
     nom = models.CharField(max_length=256)
     description = models.TextField()
@@ -20,3 +20,19 @@ class variante_produit(models.Model) :
     sku = models.CharField(max_length=64, unique=True)
     def __str__(self):
         return f"{self.produit.nom} - {self.taille} - {self.couleeur} - {self.prix}Fr - {self.stock} en stock"
+
+class User(AbstractUser):
+
+    créateur ='créateur'
+    utilisateur = 'utilisateur'
+    Role_CHOICES = [
+        (créateur, 'Créateur'),
+        (utilisateur, 'Utilisateur'),
+    ]
+    role = models.CharField(max_length=20, choices=Role_CHOICES, default=utilisateur)
+    photo_de_profil = models.ImageField(upload_to='users/', null=True, blank= True)
+    adresse = models.CharField(max_length=256, null=True, blank=True)
+    def __str__(self):
+        return f"{self.username} - {self.role}"
+
+    
