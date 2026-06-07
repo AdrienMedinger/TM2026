@@ -8,7 +8,7 @@ from django.shortcuts import redirect
 def login_page(request):
     form = forms.loginForm()
     message =''
-    if request.method == 'post':
+    if request.method == 'POST':
         form = forms.loginForm(request.POST)
         if form.is_valid():
             user = authenticate(
@@ -23,3 +23,7 @@ def login_page(request):
                 message = 'Identifiants invalides'
     return render(request, 'projet/login.html', {'form': form, 'message': message})
             
+
+def logout_page(request):
+    logout(request)
+    return redirect('login')

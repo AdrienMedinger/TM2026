@@ -1,0 +1,15 @@
+<html>
+    <head>
+        <title>BloomWay</title>
+    </head>
+    <body>
+        <h1>BloomWay</h1>
+        {% block content %}
+        {% endblock %}
+        {% if user.is_authenticated %}
+            <p>Bienvenue, {{ user.username }}! <a href="{% url 'logout' %}">Logout</a></p>
+        {% else %}
+            <p><a href="{% url 'login' %}">Login</a></p>
+        {% endif %}
+    </body>
+</html>
