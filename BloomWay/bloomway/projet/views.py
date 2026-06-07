@@ -1,9 +1,25 @@
 from django.http import HttpResponse
 from django.shortcuts import render
+from . import forms 
+from django.contrib.auth import authenticate, login, logout
+from django.shortcuts import redirect
 
 
-def hello(request):
-    return HttpResponse('<h1>Hello Django!</h1>')
-
-def about(request):
-    return HttpResponse('<h1>à propos</h1> <p> nous adorons bloomway</p>')  
+def login_page(request):
+    form = forms.loginForm()
+    message =''
+    if request.method == 'post':
+        form = forms.loginForm(request.POST)
+        if form.is_valid():
+            user = authenticate(
+                username=form.cleaned_data['username'],
+                password=form.cleaned_data['password']
+            )
+            if user is not None:
+                login(request, user)
+                message = 'Connexion réussie'
+                return redirect('home')
+            else: 
+                message = 'Identifiants invalides'
+    return render(request, 'projet/login.html', {'form': form, 'message': message})
+            

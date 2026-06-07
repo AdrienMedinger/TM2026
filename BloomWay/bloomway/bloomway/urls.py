@@ -20,7 +20,5 @@ from projet import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('hello/', views.hello, name='hello'),
-    path('about-us/', views.about,name='about'),
-    
+
 ]
