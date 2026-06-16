@@ -24,4 +24,5 @@ urlpatterns = [
     path('logout/', projet.views.logout_page, name='logout'),
     path('home/', projet.views.home, name='home'),
     path('signup/', projet.views.signup_page, name='signup'),
+    path('affichage_produit/<int:produit_id>/', projet.views.affichage_produit, name='affichage_produit'),
 ]

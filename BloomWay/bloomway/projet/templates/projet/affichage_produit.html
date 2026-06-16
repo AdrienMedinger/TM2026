@@ -1,0 +1,27 @@
+{% extends 'projet/base.html' %}
+{% block content %}
+<h2> produit de la catégorie : {{ categorie.categorie_produit}}</h2>
+
+<form method ="get">
+    <label>Taille :</label>
+    <select name="taille">
+        <option value="">Toutes</option>
+        <option value="S" {% if request.GET.taille == 'S' %}selected{% endif %}>S</option>
+        <option value="M" {% if request.GET.taille == 'M' %}selected{% endif %}>M</option>
+        <option value="L" {% if request.GET.taille == 'L' %}selected{% endif %}>L</option>
+    </select>
+    <label>Couleur :</label>
+    <input type="text" name="couleur" value="{{ request.GET.couleur }}">
+
+    <label>Stock :</label>
+    <input type="number" name="stock" value="{{ request.GET.stock }}">
+
+    <label>Prix min :</label>
+    <input type="number" step="0.01" name="prix_min" value="{{ request.GET.prix_min }}">
+
+    <label>Prix max :</label>
+    <input type="number" step="0.01" name="prix_max" value="{{ request.GET.prix_max }}">
+
+
+    <button type="submit">Filtrer</button>
+</form>

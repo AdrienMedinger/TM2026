@@ -6,7 +6,7 @@ from django.shortcuts import redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.conf import settings 
 from .models import produit, variante_produit, User
-
+from .models import categorie_produit 
 
 def login_page(request):
     form = forms.loginForm()
@@ -47,5 +47,26 @@ def signup_page(request):
 
 def affichage_produit(request, produit_id):
     categorie = produit.objects.get(id=produit_id)
-    produits = variante_produit.objects.filter(categorie=categorie)
-    return render(request, 'projet/affichage_produit.html', {'produits': produits, 'categorie': categorie})
+
+
+    produit = produit.objects.filter(categorie_produit=categorie)
+    
+
+    taille = request.GET.get('taille')
+    couleur = request.GET.get('couleur')
+    stock = request.GET.get('stock')
+    prix_min = request.GET.get('prix_min')
+    prix_max = request.GET.get('prix_max')
+
+    if taille:
+        produit = produit.filter(variantes__taille=taille)
+    if couleur:
+        produit = produit.filter(variantes__couleur=couleur)
+    if stock:
+        produit = produit.filter(variantes__stock__gte=stock)
+    if prix_min:
+        produit = produit.filter(variantes__prix__gte=prix_min)
+    if prix_max:
+        produit = produit.filter(variantes__prix__lte=prix_max)
+
+    return render(request, 'projet/affichage_produit.html', {'categorie': categorie, 'produit': produit,})
