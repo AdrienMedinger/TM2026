@@ -4,7 +4,7 @@ class produit(models.Model) :
     nom = models.CharField(max_length=256)
     description = models.TextField()
     categorie = models.CharField(max_length=256)
-    image_principale = models.ImageField(upload_to='produits/')
+    image_principale = models.ImageField(upload_to='produits/', blank=True,null=True)
     dispponibilité = models.BooleanField(default=True)
     date_création = models.DateTimeField(auto_now_add=True)
     date_modification = models.DateTimeField(auto_now=True)

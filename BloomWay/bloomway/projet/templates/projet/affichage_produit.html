@@ -25,3 +25,29 @@
 
     <button type="submit">Filtrer</button>
 </form>
+
+<hr>
+
+{% for p in produit %}
+
+<div> 
+    <h3> {{ p.nom }}</h3>
+    <p> Catégorie : {{ p.categorie_produit }}</p>
+    {% for variante in p.variante.produit %}
+
+    <div> 
+        <p> Taille : {{ variante.taille}}</p>
+        <p> Couleur : {{ variante. couleur }}</p>
+        <p> Stock : {{ variante.stock }}</p>
+        <p> Prix :  {{ variante.prix }}</p>
+    
+    </div>
+    {% endfor%}
+</div>
+<hr>
+{% empty %}
+<p> Aucun produit trouvé </p>
+{% endfor %}
+
+{% endblock %}
+
