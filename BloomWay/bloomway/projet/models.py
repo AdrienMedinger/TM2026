@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, User 
 class produit(models.Model) :
     nom = models.CharField(max_length=256)
     description = models.TextField()
@@ -35,4 +35,19 @@ class User(AbstractUser):
     def __str__(self):
         return f"{self.username} - {self.role}"
 
+
+class Panier(models.Model):
+    utilisateur = models.OneToOneField(User, on_delete=models.CASCADE, related_name='panier')
+    produit = models.ManyToManyField(variante_produit, through='PanierProduit')
+    date_création = models.DateTimeField(auto_now_add=True)
+    date_modification = models.DateTimeField(auto_now=True)
+    def __str__(self):
+        return f"Panier de {self.utilisateur.username}"
     
+class PanierProduit(models.Model):
+    panier = models.ForeignKey(Panier, on_delete=models.CASCADE)
+    variante_produit = models.ForeignKey(variante_produit, on_delete=models.CASCADE)
+    quantite = models.PositiveIntegerField(default=1)
+    class Meta:
+        unique_together = ('panier', 'variante_produit')
+        

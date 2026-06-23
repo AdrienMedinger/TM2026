@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.conf import settings 
-from .models import produit, variante_produit, User
+from .models import produit, variante_produit, User, Panier, PanierProduit
 
 
 def login_page(request):
@@ -45,7 +45,7 @@ def signup_page(request):
             return redirect('login')
     return render(request, 'projet/signup.html', context={'form': form})
 
-def affichage_produit(request, produit_id):
+def filtre_produit(request, produit_id):
 
     produit_reference = produit.objects.get(id=produit_id)
 
@@ -72,4 +72,39 @@ def affichage_produit(request, produit_id):
     if prix_max:
         produits = produits.filter(variantes_produit__prix__lte=prix_max)
 
-    return render(request, 'projet/affichage_produit.html', {'categorie': categorie, 'produit': produits,})
+    return render(request, 'projet/filtre_produit.html', {'categorie': categorie, 'produit': produits,})
+
+
+def affichage_panier(request):
+    panier, created = panier.objects.get_or_create(utilisateur=request.user)
+    return render(request, 'projet/panier.html', {'panier': panier})
+
+def ajouter_au_panier(request, variante_produit_id):
+    variante = get_object_or_404(variante_produit, id=variante_produit_id)
+    panier, created = Panier.objects.get_or_create(utilisateur=request.user)
+    panier_produit, created = PanierProduit.objects.get_or_create(panier=panier, variante_produit=variante)
+    panier_produit.quantite += 1
+    panier_produit.save()
+    return redirect('affichage_panier')
+
+def supprimer_du_panier(request, variante_produit_id):
+    variante = get_object_or_404(variante_produit, id=variante_produit_id)
+    panier = get_object_or_404(Panier, utilisateur=request.user)
+    panier_produit = get_object_or_404(PanierProduit, panier=panier, variante_produit=variante)
+    panier_produit.delete()
+    return redirect('affichage_panier')
+
+def modifier_quantite_panier(request, variante_produit_id, action):
+    variante = get_object_or_404(variante_produit, id=variante_produit_id)
+    panier = get_object_or_404(Panier, utilisateur=request.user)
+    panier_produit = get_object_or_404(PanierProduit, panier=panier, variante_produit=variante)
+
+    if action == 'plus':
+        panier_produit.quantite += 1
+        panier_produit.save()
+    elif action == 'moins':
+        if panier_produit.quantite > 1:
+            panier_produit.quantite -= 1
+            panier_produit.save()
+        else:
+            panier_produit.delete()
