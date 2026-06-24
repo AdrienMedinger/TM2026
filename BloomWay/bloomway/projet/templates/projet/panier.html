@@ -1,1 +1,37 @@
 {% extends 'projet/base.html' %} 
+
+{% block content %}
+<h1> Mon Panier  </h1>
+
+{% if Panier.PanierProduit_set.all}
+<table>
+    <tr>
+        <th>Produit</th>
+        <th>Taille</th>
+        <th>Couleur</th>
+        <th>Quantité</th>
+        <th>Prix unitaire</th>
+        <th>Total</th>
+        <th>Actions</th>
+    </tr>
+    {% for item in Panier.PanierProduit_set.all %}
+    <tr>
+        <td>{{ item.variante_produit.produit.nom }}</td>
+        <td>{{ item.variante_produit.taille }}</td>
+        <td>{{ item.variante_produit.couleur }}</td>
+        <td>{{ item.quantite }}</td>
+        <td>{{ item.variante_produit.prix }} Fr </td>
+        
+        <td>
+            <a href="{% url 'modifier_quantite_panier' item.variante_produit.id 'augmenter' %}">+</a>
+            <a href ="{% url 'modifier_quantite_panier' item.variante_produit.id 'diminuer' %}">-</a>
+            <a href="{% url 'supprimer_du_panier' item.variante_produit.id  %}">Supprimer</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% else %}
+<p>Votre panier est vide.</p>
+{% endif %}
+{% endblock %}

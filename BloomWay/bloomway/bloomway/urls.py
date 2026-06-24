@@ -24,7 +24,9 @@ urlpatterns = [
     path('logout/', projet.views.logout_page, name='logout'),
     path('home/', projet.views.home, name='home'),
     path('signup/', projet.views.signup_page, name='signup'),
-    path('filtre_produit/<int:produit_id>/', projet.views.filtre_produit, name='filtre_produit'),
-    path('panier/modifier/<int:produit_id>/<str:action>/', projet.views.modifier_quantite_panier, name='modifier_quantite_panier'),
+    path('filtre_produit/<int:variante_produit_id>/', projet.views.filtre_produit, name='filtre_produit'),
     path('panier/', projet.views.affichage_panier, name='affichage_panier'),
+    path('panier/modifier/<int:variante_produit_id>/<str:action>/', projet.views.modifier_quantite_panier, name='modifier_quantite_panier'),
+    path('panier/ajouter/<int:variante_produit_id>/', projet.views.ajouter_au_panier, name='ajouter_au_panier'),
+    path('panier/supprimer/<int:variante_produit_id>/', projet.views.supprimer_du_panier, name='supprimer_du_panier'),
 ]
