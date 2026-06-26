@@ -34,7 +34,24 @@ def logout_page(request):
 
 @login_required
 def home(request):
-    return render(request, 'projet/home.html')
+    produits = produit.objects.all()
+
+    query = request.GET.get("q")
+    if query:
+        produits = produit.filter(nom__incontains=query)
+    
+    if request.GET.get(filter):
+        produits = filtre_produit(request, produits)
+
+    panier= request.session.get('panier', {})
+
+    context = {
+        'produits': produits,
+        'panier': panier,
+        'query': query,
+    }
+
+    return render(request, 'projet/home.html', context)
 
 def signup_page(request):
     form = forms.signupForm()
