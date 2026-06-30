@@ -3,7 +3,7 @@
 {% block content %}
 <h1> Mon Panier  </h1>
 
-{% if Panier.PanierProduit_set.all}
+{% if Panier.PanierProduit_set.all%}
 <table>
     <tr>
         <th>Produit</th>
@@ -30,8 +30,8 @@
     </tr>
     {% endfor %}
 </table>
-
 {% else %}
 <p>Votre panier est vide.</p>
 {% endif %}
+
 {% endblock %}

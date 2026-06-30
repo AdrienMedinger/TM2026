@@ -4,10 +4,8 @@
         <input type ="text" name="q" placeholder="Rechercher un produit" value="{ query|default:''    }">
         <button type="submit">Rechercher</button>
     </form>
-    <form method = "get" action="{% url 'home' %}">
-        <input type="hidden" name="filtrer" vallue="1">
-        <button type="submit">&#9776;</button>
-    </form>
+    <a href="{% url 'filtre_produit'%}">&#9776;</a>
+
     <a href="{% url 'affichage_panier' %}">Panier</a>
 
     <hr>

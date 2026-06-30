@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.conf import settings 
-from .models import produit, variante_produit, User, Panier, PanierProduit
+from .models import Produit, Variante_produit, User, Panier, PanierProduit
 
 
 def login_page(request):
@@ -34,20 +34,22 @@ def logout_page(request):
 
 @login_required
 def home(request):
-    produits = produit.objects.all()
+    produits = Produit.objects.all()
 
     query = request.GET.get("q")
     if query:
-        produits = produit.filter(nom__incontains=query)
+        produits = Produit.objects.filter(nom__icontains=query)
+    else:
+        produits = Produit.objects.all()
     
-    if request.GET.get(filter):
+    if request.GET.get('filter'):
         produits = filtre_produit(request, produits)
 
-    panier= request.session.get('panier', {})
+    mon_panier= request.session.get('panier', {})
 
     context = {
         'produits': produits,
-        'panier': panier,
+        'panier': mon_panier,
         'query': query,
     }
 
@@ -62,42 +64,53 @@ def signup_page(request):
             return redirect('login')
     return render(request, 'projet/signup.html', context={'form': form})
 
-def filtre_produit(request, produit_id):
+def filtre_produit(request, variante_produit_id = None):
+    produits = Produit.objects.all()
 
-    produit_reference = produit.objects.get(id=produit_id)
-
-    categorie = produit_reference.categorie
-
-
-    produits = produit.objects.filter(categorie=categorie)
+    categories = Produit.objects.values_list('categorie', flat=True).distinct()
+    categorie_selectionnee = request.GET.get('categorie','')
     
+    if categorie_selectionnee :
+        produits = produits.filter(categorie=categorie_selectionnee)
 
-    taille = request.GET.get('taille')
-    couleur = request.GET.get('couleur')
-    stock = request.GET.get('stock')
-    prix_min = request.GET.get('prix_min')
-    prix_max = request.GET.get('prix_max')
+        taille = request.GET.get('taille')
+        couleur = request.GET.get('couleur')
+        stock = request.GET.get('stock')
+        prix_min = request.GET.get('prix_min')
+        prix_max = request.GET.get('prix_max')
 
-    if taille:
-        produits = produits.filter(variantes_produit__taille=taille)
-    if couleur:
-        produits = produits.filter(variantes_produit__couleur=couleur)
-    if stock:
-        produits = produits.filter(variantes_produit__stock__gte=stock)
-    if prix_min:
-        produits = produits.filter(variantes_produit__prix__gte=prix_min)
-    if prix_max:
-        produits = produits.filter(variantes_produit__prix__lte=prix_max)
+        if taille:
+            produits = produits.filter(variantes__taille=taille)
+        
+        if couleur:
+             produits = produits.filter(variantes__couleur=couleur)
+       
+        if stock:
+             produits = produits.filter(variantes__stock__gte=stock)
+       
+        if prix_min:
+            produits = produits.filter(variantes__prix__gte=prix_min)
+        
+        if prix_max:
+             produits = produits.filter(variantes__prix__lte=prix_max)
+    
+        
+    context = {
+        'produits': produits.distinct(),
+        'categories': categories,
+        'categorie_selectionnee': categorie_selectionnee,}   
 
-    return render(request, 'projet/filtre_produit.html', {'categorie': categorie, 'produit': produits,})
+    
+    print("CATEGORIES=",list(categories))
+    return render(request, 'projet/filtre_produit.html', context)
 
 
 def affichage_panier(request):
-    panier, created = panier.objects.get_or_create(utilisateur=request.user)
-    return render(request, 'projet/panier.html', {'panier': panier})
+    mon_panier, created = Panier.objects.get_or_create(utilisateur=request.user)
+    return render(request, 'projet/panier.html', {'panier': mon_panier})
 
 def ajouter_au_panier(request, variante_produit_id):
-    variante = get_object_or_404(variante_produit, id=variante_produit_id)
+    variante = get_object_or_404(Variante_produit, id=variante_produit_id)
     panier, created = Panier.objects.get_or_create(utilisateur=request.user)
     panier_produit, created = PanierProduit.objects.get_or_create(panier=panier, variante_produit=variante)
     panier_produit.quantite += 1
@@ -105,14 +118,14 @@ def ajouter_au_panier(request, variante_produit_id):
     return redirect('affichage_panier')
 
 def supprimer_du_panier(request, variante_produit_id):
-    variante = get_object_or_404(variante_produit, id=variante_produit_id)
+    variante = get_object_or_404(Variante_produit, id=variante_produit_id)
     panier = get_object_or_404(Panier, utilisateur=request.user)
     panier_produit = get_object_or_404(PanierProduit, panier=panier, variante_produit=variante)
     panier_produit.delete()
     return redirect('affichage_panier')
 
 def modifier_quantite_panier(request, variante_produit_id, action):
-    variante = get_object_or_404(variante_produit, id=variante_produit_id)
+    variante = get_object_or_404(Variante_produit, id=variante_produit_id)
     panier = get_object_or_404(Panier, utilisateur=request.user)
     panier_produit = get_object_or_404(PanierProduit, panier=panier, variante_produit=variante)
 

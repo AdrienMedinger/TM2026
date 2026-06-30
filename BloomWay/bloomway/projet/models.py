@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, User 
-class produit(models.Model) :
+class Produit(models.Model) :
     nom = models.CharField(max_length=256)
     description = models.TextField()
     categorie = models.CharField(max_length=256)
@@ -11,15 +11,15 @@ class produit(models.Model) :
     def __str__(self):
         return self.nom
     
-class variante_produit(models.Model) :
-    produit = models.ForeignKey(produit, on_delete=models.CASCADE, related_name='variantes')
+class Variante_produit(models.Model) :
+    produit = models.ForeignKey(Produit, on_delete=models.CASCADE, related_name='variantes')
     taille = models.CharField(max_length=64)
     couleur = models.CharField(max_length=64)
     prix = models.DecimalField(max_digits=10, decimal_places=2)
     stock = models.PositiveIntegerField(default=0)
     sku = models.CharField(max_length=64, unique=True)
     def __str__(self):
-        return f"{self.produit.nom} - {self.taille} - {self.couleeur} - {self.prix}Fr - {self.stock} en stock"
+        return f"{self.produit.nom} - {self.taille} - {self.couleur} - {self.prix}Fr - {self.stock} en stock"
 
 class User(AbstractUser):
 
@@ -38,7 +38,7 @@ class User(AbstractUser):
 
 class Panier(models.Model):
     utilisateur = models.OneToOneField(User, on_delete=models.CASCADE, related_name='panier')
-    produit = models.ManyToManyField(variante_produit, through='PanierProduit')
+    produit = models.ManyToManyField(Variante_produit, through='PanierProduit')
     date_création = models.DateTimeField(auto_now_add=True)
     date_modification = models.DateTimeField(auto_now=True)
     def __str__(self):
@@ -46,7 +46,7 @@ class Panier(models.Model):
     
 class PanierProduit(models.Model):
     panier = models.ForeignKey(Panier, on_delete=models.CASCADE)
-    variante_produit = models.ForeignKey(variante_produit, on_delete=models.CASCADE)
+    variante_produit = models.ForeignKey(Variante_produit, on_delete=models.CASCADE)
     quantite = models.PositiveIntegerField(default=1)
     class Meta:
         unique_together = ('panier', 'variante_produit')
