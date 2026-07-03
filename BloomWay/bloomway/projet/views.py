@@ -92,7 +92,7 @@ def filtre_produit(request, variante_produit_id = None):
             produits = produits.filter(variantes__prix__gte=prix_min)
         
         if prix_max:
-             produits = produits.filter(variantes__prix__lte=prix_max)
+            produits = produits.filter(variantes__prix__lte=prix_max)
     
         
     context = {
@@ -138,3 +138,16 @@ def modifier_quantite_panier(request, variante_produit_id, action):
             panier_produit.save()
         else:
             panier_produit.delete()
+    return redirect('affichage_panier')
+
+def checkout(request):
+    panier= get_object_or_404(Panier, utilisateur=request.user)
+    panier_produits=PanierProduit.objects.filter(panier=panier)
+
+    if not panier_produits.exists():
+        return redirect('panier')
+    
+    print("panier:", panier)
+    print("panier_produits:", panier_produits)
+
+    return redirect('panier')

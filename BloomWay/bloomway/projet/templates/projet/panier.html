@@ -26,6 +26,7 @@
             <a href="{% url 'modifier_quantite_panier' item.variante_produit.id 'augmenter' %}">+</a>
             <a href ="{% url 'modifier_quantite_panier' item.variante_produit.id 'diminuer' %}">-</a>
             <a href="{% url 'supprimer_du_panier' item.variante_produit.id  %}">Supprimer</a>
+            <a href="{% url 'checkout'%}">Passer commande</a>
         </td>
     </tr>
     {% endfor %}

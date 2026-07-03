@@ -17,6 +17,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 import projet.views
+from . import settings
+from django.conf.urls.static import static
+
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,4 +33,5 @@ urlpatterns = [
     path('panier/modifier/<int:variante_produit_id>/<str:action>/', projet.views.modifier_quantite_panier, name='modifier_quantite_panier'),
     path('panier/ajouter/<int:variante_produit_id>/', projet.views.ajouter_au_panier, name='ajouter_au_panier'),
     path('panier/supprimer/<int:variante_produit_id>/', projet.views.supprimer_du_panier, name='supprimer_du_panier'),
-]
+    path('checkout/', projet.views.checkout, name='checkout'),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
