@@ -1,9 +1,23 @@
 <html>
-    <head>
-        <title>BloomWay</title>
-    </head>
-    <body>
+<head>
+
+<title>BloomWay</title>
         <h1>BloomWay</h1>
+
+ <!-- Formulaire de recherche -->
+         <form method="get" action="{% url 'base' %}"> 
+             <input type ="text" name="q" placeholder="Rechercher un produit" value="{ query|default:''    }">
+             <button type="submit">&#128269;</button>
+         </form>
+
+<!-- Filtre des produits -->
+         <a href="{% url 'filtre_produit'%}">&#9776;</a>
+
+ <!-- Lien vers le panier -->
+         <a href="{% url 'affichage_panier' %}">Panier</a>
+    
+</head>
+<body>
         {% block content %}
         {% endblock %}
         {% if user.is_authenticated %}
@@ -11,5 +25,5 @@
         {% else %}
             <p><a href="{% url 'login' %}">Login</a></p>
         {% endif %}
-    </body>
+ </body>
 </html>

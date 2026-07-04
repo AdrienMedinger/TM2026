@@ -24,6 +24,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('base/', projet.views.base, name='base'),
     path('login/', projet.views.login_page, name='login'),
     path('logout/', projet.views.logout_page, name='logout'),
     path('home/', projet.views.home, name='home'),
@@ -34,4 +35,5 @@ urlpatterns = [
     path('panier/ajouter/<int:variante_produit_id>/', projet.views.ajouter_au_panier, name='ajouter_au_panier'),
     path('panier/supprimer/<int:variante_produit_id>/', projet.views.supprimer_du_panier, name='supprimer_du_panier'),
     path('checkout/', projet.views.checkout, name='checkout'),
+    path('about_us/', projet.views.about_us, name='about_us'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -7,7 +7,11 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings 
 from .models import Produit, Variante_produit, User, Panier, PanierProduit
 
+def base(request):
+    return render(request, 'projet/base.html')
 
+def about_us(request):
+    return render(request, 'projet/about_us.html')
 def login_page(request):
     form = forms.loginForm()
     message =''
@@ -35,6 +39,7 @@ def logout_page(request):
 @login_required
 def home(request):
     produits = Produit.objects.all()
+    variante_produit=Variante_produit.objects.all()
 
     query = request.GET.get("q")
     if query:
@@ -51,6 +56,7 @@ def home(request):
         'produits': produits,
         'panier': mon_panier,
         'query': query,
+        'variantes_produit': variante_produit,
     }
 
     return render(request, 'projet/home.html', context)
@@ -151,3 +157,4 @@ def checkout(request):
     print("panier_produits:", panier_produits)
 
     return redirect('panier')
+

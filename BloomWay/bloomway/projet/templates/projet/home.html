@@ -1,22 +1,19 @@
 {% extends 'projet/base.html' %}
 {% block content %}
-    <form method="get" action="{% url 'home' %}"> 
-        <input type ="text" name="q" placeholder="Rechercher un produit" value="{ query|default:''    }">
-        <button type="submit">Rechercher</button>
-    </form>
-    <a href="{% url 'filtre_produit'%}">&#9776;</a>
-
-    <a href="{% url 'affichage_panier' %}">Panier</a>
-
-    <hr>
 
     {% for produit in produits %}
         <div>
             <h3>{{ produit.nom }}</h3>
             <p>{{ produit.description }}</p>
-            <p>Prix: {{ produit.prix }}</p>
-        </div>
-    </hr>
 
+            {% for variante in produit.variantes.all %}
+            <p> Prix: {{ variante.prix }} CHF</p>
+            <form method="post" action="{% url 'ajouter_au_panier' variante.id %}">
+                {% csrf_token %}
+                <button type="submit">Ajouter au panier</button>
+            </form>
+                
+            {% endfor %}
+        </div>
     {% endfor %}
 {% endblock %}
