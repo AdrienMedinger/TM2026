@@ -7,9 +7,9 @@
         <option value="" {% if not categorie_selectionnee %}selected{% endif %}>choisir une categorie</option>
 
         {% for cat in categories %}
-            <option value="{{ cat }}"
-                {% if request.GET.categorie == cat %}selected{% endif %}>
-                {{ cat }}
+            <option value="{{ cat.categorie }}"
+                {% if request.GET.categorie == cat.categorie %}selected{% endif %}>
+                {{ cat.categorie }}
             </option>
         {%endfor%}
     </select>
@@ -43,11 +43,12 @@
 
 <hr>
 
-{% for p in produit %}
+{% for p in produits %}
 
 <div> 
     <h3> {{ p.nom }}</h3>
     <p> Catégorie : {{ p.categorie }}</p>
+
     {% for variante in p.variante.produit %}
 
     <div> 

@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.conf import settings 
-from .models import Produit, Variante_produit, User, Panier, PanierProduit
+from .models import Produit, Variante_produit, User, Panier, PanierProduit, Categorie
 
 def base(request):
     return render(request, 'projet/base.html')
@@ -40,6 +40,7 @@ def logout_page(request):
 def home(request):
     produits = Produit.objects.all()
     variante_produit=Variante_produit.objects.all()
+    categories = Categorie.objects.all()
 
     query = request.GET.get("q")
     if query:
@@ -57,6 +58,7 @@ def home(request):
         'panier': mon_panier,
         'query': query,
         'variantes_produit': variante_produit,
+        'categories': categories,
     }
 
     return render(request, 'projet/home.html', context)
@@ -73,11 +75,15 @@ def signup_page(request):
 def filtre_produit(request, variante_produit_id = None):
     produits = Produit.objects.all()
 
-    categories = Produit.objects.values_list('categorie', flat=True).distinct()
+    variante_produit=Variante_produit.objects.all()
+
+    categories = Categorie.objects.all()
     categorie_selectionnee = request.GET.get('categorie','')
     
+
+
     if categorie_selectionnee :
-        produits = produits.filter(categorie=categorie_selectionnee)
+        produits = produits.filter(categorie__categorie=categorie_selectionnee)
 
         taille = request.GET.get('taille')
         couleur = request.GET.get('couleur')
@@ -104,7 +110,8 @@ def filtre_produit(request, variante_produit_id = None):
     context = {
         'produits': produits.distinct(),
         'categories': categories,
-        'categorie_selectionnee': categorie_selectionnee,}   
+        'categorie_selectionnee': categorie_selectionnee,
+        'variantes_produit': variante_produit,}   
 
     
     print("CATEGORIES=",list(categories))
