@@ -6,7 +6,7 @@
 
  <!-- Formulaire de recherche -->
          <form method="get" action="{% url 'base' %}"> 
-             <input type ="text" name="q" placeholder="Rechercher un produit" value="{ query|default:''    }">
+             <input type ="text" name="q" placeholder="Rechercher un produit" value="{{ query|default:''    }}">
              <button type="submit">&#128269;</button>
          </form>
 

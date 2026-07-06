@@ -36,4 +36,5 @@ urlpatterns = [
     path('panier/supprimer/<int:variante_produit_id>/', projet.views.supprimer_du_panier, name='supprimer_du_panier'),
     path('checkout/', projet.views.checkout, name='checkout'),
     path('about_us/', projet.views.about_us, name='about_us'),
+    path('affichage_produit/', projet.views.affichage_produit, name='affichage_produit'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

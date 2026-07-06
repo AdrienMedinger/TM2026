@@ -1,28 +1,22 @@
 {% extends 'projet/base.html' %}
+
+
 {% block content %}
+{% include 'projet/navbar.html' %}
 
-    {% for produit in produits %}
-        <div>
-            <h3>{{ produit.nom }}</h3>
-            <p>{{ produit.description }}</p>
+    
 
-            {% for variante in produit.variantes.all %}
-            <p> Prix: {{ variante.prix }} CHF</p>
-            <form method="post" action="{% url 'ajouter_au_panier' variante.id %}">
-                {% csrf_token %}
-                <button type="submit">Ajouter au panier</button>
-            </form>
-                
-            {% endfor %}
-        </div>
+
+
+    {% for categorie in categories %}
+        <div class="categorie">
+            <img src="{{ categorie.image_principale.url }}" alt="{{ categorie.categorie }}"
+                width="400" height="400">
+            <h2>{{ categorie.categorie }}</h2>
+        </div> 
     {% endfor %}
+
 {% endblock %}
 
 
 
-{% for categorie in categories %}
-    <div>
-        <h3>{{ categorie }}</h3>
-        <img src="
-
-    </div> 

@@ -63,6 +63,10 @@ def home(request):
 
     return render(request, 'projet/home.html', context)
 
+
+def affichage_produit(request):
+    return render(request, 'projet/affichage_produit.html')
+
 def signup_page(request):
     form = forms.signupForm()
     if request.method == 'POST':
@@ -164,4 +168,7 @@ def checkout(request):
     print("panier_produits:", panier_produits)
 
     return redirect('panier')
+
+
+
 
