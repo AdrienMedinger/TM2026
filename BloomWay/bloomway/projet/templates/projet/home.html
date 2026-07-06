@@ -4,10 +4,6 @@
 {% block content %}
 {% include 'projet/navbar.html' %}
 
-    
-
-
-
     {% for categorie in categories %}
         <div class="categorie">
             <img src="{{ categorie.image_principale.url }}" alt="{{ categorie.categorie }}"

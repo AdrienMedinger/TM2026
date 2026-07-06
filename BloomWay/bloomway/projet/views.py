@@ -64,8 +64,14 @@ def home(request):
     return render(request, 'projet/home.html', context)
 
 
-def affichage_produit(request):
-    return render(request, 'projet/affichage_produit.html')
+def affichage_produit(request, Produit_id):
+     produit= get_object_or_404(Produit, id=Produit_id)
+     variantes=produit.variantes.all()  
+
+     return render(request, 'projet/affichage_produit.html', {'produit': produit, 'variantes': variantes})
+
+    
+
 
 def signup_page(request):
     form = forms.signupForm()
