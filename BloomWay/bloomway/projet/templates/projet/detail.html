@@ -1,4 +1,4 @@
-{% extends 'projet/base.html' %}
+{%extends 'projet/base.html' %}
 
 {% block content %}
 
@@ -10,15 +10,16 @@
 
             {% for variante in produit.variantes.all %}
             <p> Prix: {{ variante.prix }} CHF</p>
-            <form method="post" action="{% url 'detail'   %}">
+            <form method="post" action="{% url 'ajouter_au_panier' variante.id  %}">
                 {% csrf_token %}
-                <button type="submit">Détails</button>
+                <button type="submit">Ajouter au panier</button>
+            </form>
                 
             {% endfor %}
+
         </div>
-    {% empty %}
-        <p>Aucun produit trouvé.</p>
-    
-    {% endfor %}
+
+{% endfor %}
 
 {% endblock %}
+

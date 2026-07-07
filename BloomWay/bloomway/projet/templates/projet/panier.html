@@ -3,7 +3,7 @@
 {% block content %}
 <h1> Mon Panier  </h1>
 
-{% if Panier.PanierProduit_set.all%}
+{% if panier.panierproduit_set.all%}
 <table>
     <tr>
         <th>Produit</th>
@@ -14,7 +14,7 @@
         <th>Total</th>
         <th>Actions</th>
     </tr>
-    {% for item in Panier.PanierProduit_set.all %}
+    {% for item in panier.panierproduit_set.all %}
     <tr>
         <td>{{ item.variante_produit.produit.nom }}</td>
         <td>{{ item.variante_produit.taille }}</td>

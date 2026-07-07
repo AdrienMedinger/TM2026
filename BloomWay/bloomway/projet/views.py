@@ -8,10 +8,33 @@ from django.conf import settings
 from .models import Produit, Variante_produit, User, Panier, PanierProduit, Categorie
 
 def base(request):
+
+    produits = Produit.objects.all()
+    variante_produit=Variante_produit.objects.all()
+    categories = Categorie.objects.all()
+
+
+    
+
+    mon_panier= request.session.get('panier', {})
+
+
+
+   
+    context = {
+        'produits': produits,
+        'panier': mon_panier,
+        'variantes_produit': variante_produit,
+        'categories': categories,
+    }
+ 
     return render(request, 'projet/base.html')
+
 
 def about_us(request):
     return render(request, 'projet/about_us.html')
+
+
 def login_page(request):
     form = forms.loginForm()
     message =''
@@ -42,21 +65,9 @@ def home(request):
     variante_produit=Variante_produit.objects.all()
     categories = Categorie.objects.all()
 
-    query = request.GET.get("q")
-    if query:
-        produits = Produit.objects.filter(nom__icontains=query)
-    else:
-        produits = Produit.objects.all()
     
-    if request.GET.get('filter'):
-        produits = filtre_produit(request, produits)
-
-    mon_panier= request.session.get('panier', {})
-
     context = {
         'produits': produits,
-        'panier': mon_panier,
-        'query': query,
         'variantes_produit': variante_produit,
         'categories': categories,
     }
@@ -64,14 +75,30 @@ def home(request):
     return render(request, 'projet/home.html', context)
 
 
-def affichage_produit(request, Produit_id):
-     produit= get_object_or_404(Produit, id=Produit_id)
-     variantes=produit.variantes.all()  
+def affichage_produit(request):
+    query = request.GET.get("q", "")
+    produits = Produit.objects.all()
 
-     return render(request, 'projet/affichage_produit.html', {'produit': produit, 'variantes': variantes})
+    if query:
+        produits = produits.filter(nom__icontains=query)
 
-    
 
+    context = {
+        'produits': produits,
+        'query': query,
+    }
+     
+    return render(request, 'projet/affichage_produit.html', context)
+
+
+def detail(request):
+    produit = Produit.objects.all()
+    variante= Variante_produit.objects.all()
+    context = {
+        'produit': produit,
+        'variante': variante,
+    }
+    return render(request, 'projet/detail.html', context)
 
 def signup_page(request):
     form = forms.signupForm()
@@ -133,11 +160,18 @@ def affichage_panier(request):
     return render(request, 'projet/panier.html', {'panier': mon_panier})
 
 def ajouter_au_panier(request, variante_produit_id):
-    variante = get_object_or_404(Variante_produit, id=variante_produit_id)
-    panier, created = Panier.objects.get_or_create(utilisateur=request.user)
-    panier_produit, created = PanierProduit.objects.get_or_create(panier=panier, variante_produit=variante)
-    panier_produit.quantite += 1
-    panier_produit.save()
+    if request.method == 'post':
+        variante = get_object_or_404(Variante_produit, id=variante_produit_id)
+        panier, created = Panier.objects.get_or_create(utilisateur=request.user)
+        panier_produit, created = PanierProduit.objects.get_or_create(
+            panier=panier, 
+            variante_produit=variante,
+            defaults={'quantite': 0}
+        )
+
+        panier_produit.quantite += 1
+        panier_produit.save()
+
     return redirect('affichage_panier')
 
 def supprimer_du_panier(request, variante_produit_id):
@@ -152,10 +186,10 @@ def modifier_quantite_panier(request, variante_produit_id, action):
     panier = get_object_or_404(Panier, utilisateur=request.user)
     panier_produit = get_object_or_404(PanierProduit, panier=panier, variante_produit=variante)
 
-    if action == 'plus':
+    if action == 'augmenter':
         panier_produit.quantite += 1
         panier_produit.save()
-    elif action == 'moins':
+    elif action == 'diminuer':
         if panier_produit.quantite > 1:
             panier_produit.quantite -= 1
             panier_produit.save()

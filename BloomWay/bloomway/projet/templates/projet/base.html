@@ -5,9 +5,11 @@
         <h1>BloomWay</h1>
 
  <!-- Formulaire de recherche -->
-         <form method="get" action="{% url 'base' %}"> 
+         <form method="get" action="{% url 'affichage_produit' %}"> 
              <input type ="text" name="q" placeholder="Rechercher un produit" value="{{ query|default:''    }}">
              <button type="submit">&#128269;</button>
+             
+                
          </form>
 
 <!-- Filtre des produits -->
