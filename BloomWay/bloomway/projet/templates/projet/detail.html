@@ -2,10 +2,12 @@
 
 {% block content %}
 
-{% for produit in produits %}
-        <div>
+        <div class ="produit">
             <h3>{{ produit.nom }}</h3>
             <p>{{ produit.description }}</p>
+            <img src="{{produit.image_principale.url}}"
+                 alt="{{ produit.nom }}"
+                 width="300" height="300">
 
 
             {% for variante in produit.variantes.all %}
@@ -19,7 +21,6 @@
 
         </div>
 
-{% endfor %}
 
 {% endblock %}
 

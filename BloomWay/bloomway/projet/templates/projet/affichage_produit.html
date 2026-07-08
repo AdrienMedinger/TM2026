@@ -10,7 +10,7 @@
 
             {% for variante in produit.variantes.all %}
             <p> Prix: {{ variante.prix }} CHF</p>
-            <form method="post" action="{% url 'detail'   %}">
+            <form method="post" action="{% url 'detail' produit.id %}">
                 {% csrf_token %}
                 <button type="submit">Détails</button>
                 

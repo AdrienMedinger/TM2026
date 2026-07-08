@@ -91,12 +91,11 @@ def affichage_produit(request):
     return render(request, 'projet/affichage_produit.html', context)
 
 
-def detail(request):
-    produit = Produit.objects.all()
-    variante= Variante_produit.objects.all()
+def detail(request, Produit_id=None):
+    produit = get_object_or_404(Produit, id=Produit_id)
+    variante= Variante_produit.objects.filter(produit=produit)
     context = {
         'produit': produit,
-        'variante': variante,
     }
     return render(request, 'projet/detail.html', context)
 
@@ -160,7 +159,7 @@ def affichage_panier(request):
     return render(request, 'projet/panier.html', {'panier': mon_panier})
 
 def ajouter_au_panier(request, variante_produit_id):
-    if request.method == 'post':
+    if request.method == 'POST':
         variante = get_object_or_404(Variante_produit, id=variante_produit_id)
         panier, created = Panier.objects.get_or_create(utilisateur=request.user)
         panier_produit, created = PanierProduit.objects.get_or_create(
@@ -171,7 +170,6 @@ def ajouter_au_panier(request, variante_produit_id):
 
         panier_produit.quantite += 1
         panier_produit.save()
-
     return redirect('affichage_panier')
 
 def supprimer_du_panier(request, variante_produit_id):
