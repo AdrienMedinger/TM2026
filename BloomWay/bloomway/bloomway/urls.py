@@ -38,4 +38,5 @@ urlpatterns = [
     path('about_us/', projet.views.about_us, name='about_us'),
     path('affichage_produit/', projet.views.affichage_produit, name='affichage_produit'),
     path('detail/<int:Produit_id>/', projet.views.detail, name='detail'),
+    path('payment_success/', projet.views.payment_success, name='payment_success'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

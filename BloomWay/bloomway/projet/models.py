@@ -80,7 +80,7 @@ class Order(models.Model):
     paid = models.BooleanField(default=False)
     strip_id = models.CharField(max_length=255, blank=True,)
 
-    status = models.BooleanField(default=False)  # False = not shipped, True = shipped
+    status = models.BooleanField(default=False)  # False = pas envoyé, True = envoyé 
 
     class Meta:
         ordering = ('-created_at',)

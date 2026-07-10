@@ -195,6 +195,10 @@ def modifier_quantite_panier(request, variante_produit_id, action):
             panier_produit.delete()
     return redirect('affichage_panier')
 
+
+def payment_success(request):
+    return render(request, 'projet/payment_success.html')
+
 def checkout(request):
     panier= get_object_or_404(Panier, utilisateur=request.user)
     panier_produits=PanierProduit.objects.filter(panier=panier)
