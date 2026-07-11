@@ -209,7 +209,7 @@ def checkout(request):
     print("panier:", panier)
     print("panier_produits:", panier_produits)
 
-    return redirect('panier')
+    return render(request, 'projet/checkout.html', {'panier': panier, 'panier_produits': panier_produits})
 
 
 

@@ -65,44 +65,47 @@ class PanierProduit(models.Model):
         unique_together = ('panier', 'variante_produit')
 
         
+
+
+class AdresseCommande(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='adresses_commande')
+
+    nom_entier = models.CharField(max_length=255,default="")
+    email = models.EmailField(max_length=255)
+    adresse = models.CharField(max_length=255)
+    ville = models.CharField(max_length=100)
+    code_postal = models.CharField(max_length=20)
+    pays = models.CharField(max_length=100)
+    stripe_id = models.CharField(max_length=255, blank=True)
+   
+
+    def __str__(self):
+        return f" AdresseCommande - {str(self.id)} "
+    
+
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders',blank=True, null=True)
 
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
-    email = models.EmailField()
-    address = models.CharField(max_length=255, default='', blank=True)
-    city = models.CharField(max_length=100)
-    postal_code = models.CharField(max_length=20)
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    paid = models.BooleanField(default=False)
-    strip_id = models.CharField(max_length=255, blank=True,)
+    nom_entier = models.CharField(max_length=255,default="")
+    email = models.EmailField(max_length=255)
+    address = models.TextField(max_length=10000)
+    montant_payé = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    date_commande = models.DateTimeField(auto_now_add=True)
 
     status = models.BooleanField(default=False)  # False = pas envoyé, True = envoyé 
 
-    class Meta:
-        ordering = ('-created_at',)
-        indexes =[
-            models.Index(fields=['-created_at']),       
-        ]
     def __str__(self):
-        return f'Order {self.id}'
-    
-    def get_total_cost(self):
-        return sum(item.get_cost() for item in self.items.all())
+        return f"Order - {str(self.id)}"
+
     
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
-    produit = models.ForeignKey(Produit, on_delete=models.CASCADE, related_name='order_items')
-    variante_produit = models.ForeignKey(Variante_produit, on_delete=models.CASCADE, related_name='order_items')
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    produit = models.ForeignKey(Produit, on_delete=models.CASCADE)
+    variante_produit = models.ForeignKey(Variante_produit, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    quantity = models.PositiveIntegerField(default=1)
+    quantité = models.PositiveIntegerField(default=1)
 
     def __str__(self):
-        return f'Ligne {self.id} de la commande {self.order.id}'
-
-    def get_cost(self):
-        return self.price * self.quantity
+        return f"OrderItem - {str(self.id)}"

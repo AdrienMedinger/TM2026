@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import Group
-from .models import Produit, Variante_produit, User, Panier, PanierProduit, Order, OrderItem, Categorie
+from .models import Produit, Variante_produit, User, Panier, PanierProduit, Order, OrderItem, Categorie, AdresseCommande
 # Register your models here.
 
 admin.site.unregister(Group)
@@ -20,3 +20,4 @@ admin.site.register(PanierProduit)
 admin.site.register(Order)
 admin.site.register(OrderItem)
 admin.site.register(Categorie)
+admin.site.register(AdresseCommande)
