@@ -1,12 +1,12 @@
 from django.http import HttpResponse
 from django.shortcuts import render
-from . import forms 
+from . import forms
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.conf import settings 
-from .models import Produit, Variante_produit, User, Panier, PanierProduit, Categorie
-
+from .models import Produit, Variante_produit, User, Panier, PanierProduit, Categorie, AdresseCommande
+from .forms import ShippingForm
 def base(request):
 
     produits = Produit.objects.all()
@@ -206,10 +206,28 @@ def checkout(request):
     if not panier_produits.exists():
         return redirect('panier')
     
+    total = 0
+
+    for panier_produit in panier_produits:
+        total += (
+            panier_produit.variante_produit.prix*panier_produit.quantite
+        )
+
+    if request.user.is_authenticated:
+        # checkout comme utilisateur enregistré
+        shipping_user= AdresseCommande.objects.get(user__id= request.user.id)
+        shipping_form = ShippingForm(request.POST or None, instance= shipping_user)
+        return render(request, 'projet/checkout.html', {'panier': panier, 'panier_produits': panier_produits,'total': total,'shipping_form':shipping_form})
+    
+    else:
+        # checkout tell un non-connecté
+        shipping_form = ShippingForm(request.POST or None)
+        return render(request, 'projet/checkout.html', {'panier': panier, 'panier_produits': panier_produits,'total': total,'shipping_form':shipping_form})
+        
     print("panier:", panier)
     print("panier_produits:", panier_produits)
 
-    return render(request, 'projet/checkout.html', {'panier': panier, 'panier_produits': panier_produits})
+    return render(request, 'projet/checkout.html', {'panier': panier, 'panier_produits': panier_produits,'total': total})
 
 
 

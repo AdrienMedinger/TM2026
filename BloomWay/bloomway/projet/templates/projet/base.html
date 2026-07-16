@@ -3,21 +3,26 @@
 
 <title>BloomWay</title>
         <h1>BloomWay</h1>
-
+<div class="ligne">
  <!-- Formulaire de recherche -->
+    <div>
          <form method="get" action="{% url 'affichage_produit' %}"> 
              <input type ="text" name="q" placeholder="Rechercher un produit" value="{{ query|default:''    }}">
              <button type="submit">&#128269;</button>
-             
+    </div>
                 
          </form>
 
 <!-- Filtre des produits -->
+    <div>
          <a href="{% url 'filtre_produit'%}">&#9776;</a>
+    </div>
 
  <!-- Lien vers le panier -->
+    <div>
          <a href="{% url 'affichage_panier' %}">Panier</a>
-    
+    </div>
+</div>
 </head>
 <body>
         {% block content %}

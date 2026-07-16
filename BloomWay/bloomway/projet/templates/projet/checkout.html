@@ -1,17 +1,43 @@
-{% extends 'projet/base.html' %}
+
 
 {% block content %}
 <h1> Checkout </h1>
+<div class ="container">
+    <div class ="row">
+        <div class="col-md-6">
+    </div>
+</div>
 
 <div class="card">
   <div class="card-header">
     Formulaire de paiement
   </div>
+  <br></br>
   <div class="card-body">
-    <h5 class="card-title">Special title treatment</h5>
-    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-    <a href="#" class="btn btn-primary">Go somewhere</a>
+    {% for panier_produit in panier_produits %}
+        <strong>Produit: {{ panier_produit.variante_produit.produit.nom }}</strong>
+
+        <small> Quantité: {{ panier_produit.quantite }}</small>
+
+        <br></br>
+
+    {% endfor %}
+
+    Total: {{total}}
+        <br></br>
+
+    <a href="{% url 'affichage_panier' %}" class="btn btn-sm">modifier panier</a>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header">
+    info de livraison
+  </div>
+  <div class="card-body">
+    {{ shipping_form.as_p}}
+    
   </div>
 </div>
 
+<a href="#" class ="btn btn-secondary" > continuée l'achat</a>
 {% endblock %}

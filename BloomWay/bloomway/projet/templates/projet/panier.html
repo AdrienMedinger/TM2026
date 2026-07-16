@@ -9,8 +9,8 @@
         <th>Produit</th>
         <th>Taille</th>
         <th>Couleur</th>
-        <th>Quantité</th>
-        <th>Prix unitaire</th>
+        <th>prix unitaire </th>
+        <th>quantité</th>
         <th>Total</th>
         <th>Actions</th>
     </tr>
@@ -19,8 +19,8 @@
         <td>{{ item.variante_produit.produit.nom }}</td>
         <td>{{ item.variante_produit.taille }}</td>
         <td>{{ item.variante_produit.couleur }}</td>
-        <td>{{ item.quantite }}</td>
         <td>{{ item.variante_produit.prix }} Fr </td>
+         <td>{{ item.quantite }}</td>
         
         <td>
             <a href="{% url 'modifier_quantite_panier' item.variante_produit.id 'augmenter' %}">+</a>
