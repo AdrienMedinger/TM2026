@@ -211,24 +211,26 @@ def checkout(request):
     for panier_produit in panier_produits:
         total += (
             panier_produit.variante_produit.prix*panier_produit.quantite
+
         )
 
     if request.user.is_authenticated:
         # checkout comme utilisateur enregistré
-        shipping_user= AdresseCommande.objects.get(user__id= request.user.id)
+        shipping_user= AdresseCommande.objects.filter(user__id= request.user.id).first()
         shipping_form = ShippingForm(request.POST or None, instance= shipping_user)
         return render(request, 'projet/checkout.html', {'panier': panier, 'panier_produits': panier_produits,'total': total,'shipping_form':shipping_form})
     
-    else:
-        # checkout tell un non-connecté
-        shipping_form = ShippingForm(request.POST or None)
-        return render(request, 'projet/checkout.html', {'panier': panier, 'panier_produits': panier_produits,'total': total,'shipping_form':shipping_form})
+    
+
+
+def facturation_info(request):
+     panier= get_object_or_404(Panier, utilisateur=request.user)
+     panier_produits=PanierProduit.objects.filter(panier=panier)
+
+     shipping_form = request.POST
+
+     return render (request, 'projet/facturation.info_html',{'panier': panier, 'panier_produits': panier_produits})
+    
         
-    print("panier:", panier)
-    print("panier_produits:", panier_produits)
-
-    return render(request, 'projet/checkout.html', {'panier': panier, 'panier_produits': panier_produits,'total': total})
-
-
-
+   
 
