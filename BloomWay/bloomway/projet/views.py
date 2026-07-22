@@ -229,7 +229,15 @@ def facturation_info(request):
 
      shipping_form = request.POST
 
-     return render (request, 'projet/facturation.info_html',{'panier': panier, 'panier_produits': panier_produits})
+     total = 0
+
+     for panier_produit in panier_produits:
+        total += (
+            panier_produit.variante_produit.prix*panier_produit.quantite
+
+        )
+
+     return render (request, 'projet/facturation_info.html',{'panier': panier, 'panier_produits': panier_produits,'total':total})
     
         
    
