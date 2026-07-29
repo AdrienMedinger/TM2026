@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings 
 from .models import Produit, Variante_produit, User, Panier, PanierProduit, Categorie, AdresseCommande
 from .forms import ShippingForm
+from django.contrib import messages
 def base(request):
 
     produits = Produit.objects.all()
@@ -224,21 +225,24 @@ def checkout(request):
 
 
 def facturation_info(request):
-     panier= get_object_or_404(Panier, utilisateur=request.user)
-     panier_produits=PanierProduit.objects.filter(panier=panier)
+    if request.POST:
+        panier= get_object_or_404(Panier, utilisateur=request.user)
+        panier_produits=PanierProduit.objects.filter(panier=panier)
 
-     shipping_form = request.POST
+        shipping_form = request.POST
 
-     total = 0
+        total = 0
 
-     for panier_produit in panier_produits:
-        total += (
-            panier_produit.variante_produit.prix*panier_produit.quantite
+        for panier_produit in panier_produits:
+            total += (
+                panier_produit.variante_produit.prix*panier_produit.quantite
 
-        )
+            )
 
-     return render (request, 'projet/facturation_info.html',{'panier': panier, 'panier_produits': panier_produits,'total':total})
+        return render (request, 'projet/facturation_info.html',{'panier': panier, 'panier_produits': panier_produits,'total':total})
     
-        
+    else:
+        messages.success(request, " accès refusé")
+        return redirect("home")   
    
 

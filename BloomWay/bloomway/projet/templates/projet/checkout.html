@@ -9,25 +9,31 @@
 </div>
 
 <div class="card">
-  <div class="card-header">
+    <div class="card-header">
     Formulaire de paiement
-  </div>
-  <br></br>
-  <div class="card-body">
-    {% for panier_produit in panier_produits %}
-        <strong>Produit: {{ panier_produit.variante_produit.produit.nom }}</strong>
+    </div>
+<br></br>
+        <div class="card-body">
+            {% for panier_produit in panier_produits %}
+                <strong>Produit: {{ panier_produit.variante_produit.produit.nom }}</strong>
 
-        <small> Quantité: {{ panier_produit.quantite }}</small>
+                <small> Quantité: {{ panier_produit.quantite }}</small>
 
-        <br></br>
 
-    {% endfor %}
+                <br></br>
 
-    Total: {{total}}
-        <br></br>
+            {% endfor %}
 
-    <a href="{% url 'affichage_panier' %}" class="btn btn-sm">modifier panier</a>
-  </div>
+            Total: {{total}}
+                <br></br>
+
+            <form method="POST" action="{% url 'affichage_panier' %}">
+                <button type="submit">Modifier Panier</button>
+            </form>
+
+            
+                
+        </div>
 </div>
 <div class="card">
    
@@ -35,14 +41,17 @@
      info de livraison
     </div>
     <div class="card-body">
-        <form method ="POST" action="{% url 'facturation_info' %}">
-            {% csrf_token %}
-        </form>
-
+       
     {{ shipping_form.as_p}}
     
     </div>
 </div>
-
-<a href="{% url 'facturation_info' %}" class ="btn btn-secondary" > continuée l'achat</a>
+<div class="card">
+    <div class="card-header">
+        <form method ="POST" action="{% url 'facturation_info' %}">
+            {% csrf_token %}
+            <button type="submit">Continuer l'achat</button>
+        </form>
+    </div>
+</div>
 {% endblock %}
