@@ -6,7 +6,7 @@ from django.shortcuts import redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.conf import settings 
 from .models import Produit, Variante_produit, User, Panier, PanierProduit, Categorie, AdresseCommande
-from .forms import ShippingForm
+from .forms import ShippingForm, PaiementForm
 from django.contrib import messages
 def base(request):
 
