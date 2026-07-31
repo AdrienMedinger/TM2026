@@ -76,7 +76,7 @@ class AdresseCommande(models.Model):
     ville = models.CharField(max_length=100)
     code_postal = models.CharField(max_length=20)
     pays = models.CharField(max_length=100)
-    stripe_id = models.CharField(max_length=255, blank=True)
+    stripe_id = models.CharField(max_length=255, blank=True,null=True)
    
 
     def __str__(self):

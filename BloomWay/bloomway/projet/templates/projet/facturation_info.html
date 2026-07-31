@@ -1,5 +1,5 @@
 {% block content %}
-<h1> payement</h1>
+<h1> info de facturation</h1>
 <div class ="container">
     <div class ="row">
         <div class="col-md-6">
@@ -30,19 +30,49 @@
 <div class="card">
    
     <div class="card-header">
-     info de livraison
+     <strong>info de livraison</strong>
     </div>
     <div class="card-body">
         <form method ="POST" action="{% url 'facturation_info' %}">
             {% csrf_token %}
         </form>
 
-    {{ shipping_form.as_p}}
+    Nom entier: <small>{{ shipping_info.nom_entier }}</small>
+
+    <br></br>
+
+    Email: <small>{{ shipping_info.email }}</small>
+
+    <br></br>
+
+    Adresse: <small>{{ shipping_info.adresse }}</small>
+
+    <br></br>
+
+    Ville: <small>{{ shipping_info.ville }}</small>
+
+     <br></br>
+
+    Code Postal: <small>{{ shipping_info.code_postal }}</small>
+
+     <br></br>
+
+    Pays: <small>{{ shipping_info.pays }}</small>
+
+     <br></br>
+
     
+
     </div>
 </div>
 <div>
-    <form method="POST" action="{% url 'facturation_info' %}">
+    <form method="POST" action="{% url 'paiement' %}">
+        {% csrf_token %}
+        <input
+            type="hidden"
+            name="shipping_id"
+            value="{{ shipping_info.id }}"
+            >
         <button type="submit">Payer</button>
     </form>
 </div>

@@ -27,7 +27,7 @@
             Total: {{total}}
                 <br></br>
 
-            <form method="POST" action="{% url 'affichage_panier' %}">
+            <form method="GET" action="{% url 'affichage_panier' %}">
                 <button type="submit">Modifier Panier</button>
             </form>
 
@@ -42,7 +42,6 @@
     </div>
     <div class="card-body">
        
-    {{ shipping_form.as_p}}
     
     </div>
 </div>
@@ -50,6 +49,8 @@
     <div class="card-header">
         <form method ="POST" action="{% url 'facturation_info' %}">
             {% csrf_token %}
+            {{ shipping_form.as_p}}
+            
             <button type="submit">Continuer l'achat</button>
         </form>
     </div>

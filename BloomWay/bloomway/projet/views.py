@@ -225,24 +225,45 @@ def checkout(request):
 
 
 def facturation_info(request):
-    if request.POST:
-        panier= get_object_or_404(Panier, utilisateur=request.user)
-        panier_produits=PanierProduit.objects.filter(panier=panier)
+    if request.method != "POST":
+        return redirect("checkout")
+    panier= get_object_or_404(Panier, utilisateur=request.user)
+    panier_produits=PanierProduit.objects.filter(panier=panier)
 
-        shipping_form = request.POST
+    print("POST reçu:", request.POST)
 
-        total = 0
+    shipping_form = ShippingForm(request.POST)
 
-        for panier_produit in panier_produits:
-            total += (
-                panier_produit.variante_produit.prix*panier_produit.quantite
+    total = 0
 
-            )
+    for panier_produit in panier_produits:
+        total += (
+             panier_produit.variante_produit.prix*panier_produit.quantite
 
-        return render (request, 'projet/facturation_info.html',{'panier': panier, 'panier_produits': panier_produits,'total':total})
+        )
+
+    if shipping_form.is_valid():
+        shipping_info = shipping_form.save(commit=False)
+
+        shipping_info.user = request.user
+        shipping_info.email = request.user.email
+
+        shipping_info.save()
+
+        
+
+        return render (request, 'projet/facturation_info.html',{'panier': panier, 'panier_produits': panier_produits,'total':total,'shipping_info': shipping_info})
+        
+    return render (request, 'projet/checkout.html',{'panier': panier, 'panier_produits': panier_produits,'total':total,'shipping_form': shipping_form})
     
-    else:
-        messages.success(request, " accès refusé")
-        return redirect("home")   
-   
+    
+    
+def paiement (request):
+    if request.method != "POST":
+        return redirect("checkout")
+    shipping_id = request.POST.get("shipping_id")
 
+    shipping_info = get_object_or_404(AdresseCommande,id = shipping_id,user = request.user)
+            
+    
+    return render(request,'projet/paiement.html', {"shipping_info" : shipping_info})

@@ -22,7 +22,6 @@ class ShippingForm(forms.ModelForm):
             "ville",
             "code_postal",
             "pays", 
-            "stripe_id", 
-   
+            
         ]
    
