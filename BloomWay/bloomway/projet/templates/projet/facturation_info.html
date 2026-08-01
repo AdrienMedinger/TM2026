@@ -67,8 +67,20 @@
 
     </div>
 </div>
+<div class="card">
+   
+    <div class="card-header">
+     <strong>info de paiement</strong>
+    </div>
+    <div class="card-body">
+
+        {{ paiement_form.as_p}}
+
+    </div>
+</div>
+<br></br>
 <div>
-    <form method="POST" action="{% url 'paiement' %}">
+    <form method="POST" action="{% url 'process_order' %}">
         {% csrf_token %}
         <input
             type="hidden"

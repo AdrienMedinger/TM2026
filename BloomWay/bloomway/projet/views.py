@@ -230,9 +230,17 @@ def facturation_info(request):
     panier= get_object_or_404(Panier, utilisateur=request.user)
     panier_produits=PanierProduit.objects.filter(panier=panier)
 
+    # créer une session pour stocker les informations de livraison
+    ma_livraison = request.POST
+    request.session['ma_livraison'] = ma_livraison
+
     print("POST reçu:", request.POST)
 
     shipping_form = ShippingForm(request.POST)
+
+    paiement_form = PaiementForm()
+
+    
 
     total = 0
 
@@ -252,11 +260,11 @@ def facturation_info(request):
 
         
 
-        return render (request, 'projet/facturation_info.html',{'panier': panier, 'panier_produits': panier_produits,'total':total,'shipping_info': shipping_info})
+        return render (request, 'projet/facturation_info.html',{'panier': panier, 'panier_produits': panier_produits,'total':total,'shipping_info': shipping_info, 'paiement_form': paiement_form})
         
-    return render (request, 'projet/checkout.html',{'panier': panier, 'panier_produits': panier_produits,'total':total,'shipping_form': shipping_form})
-    
-    
+    return render (request, 'projet/checkout.html',{'panier': panier, 'panier_produits': panier_produits,'total':total,'shipping_form': shipping_form, 'paiement_form': paiement_form})
+
+
     
 def paiement (request):
     if request.method != "POST":
@@ -267,3 +275,17 @@ def paiement (request):
             
     
     return render(request,'projet/paiement.html', {"shipping_info" : shipping_info})
+
+def process_order(request):
+    if request.method != "POST":
+        return redirect("facturation_info")
+    # prendre les informations de facturation et de paiement du formulaire
+    paiement_form = PaiementForm(request.POST or None)
+    # prendre les informations de livraison du formulaire
+    ma_livraison = request.session.get('ma_livraison')
+    print("ma_livraison:", ma_livraison)
+
+
+
+
+    return render(request, 'projet/process_order.html', {'paiement_form': paiement_form, 'ma_livraison': ma_livraison})
