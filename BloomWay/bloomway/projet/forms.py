@@ -18,6 +18,7 @@ class ShippingForm(forms.ModelForm):
         model= AdresseCommande
         fields= [
             "nom_entier",
+            "email",
             "adresse",
             "ville",
             "code_postal",

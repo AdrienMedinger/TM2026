@@ -1,7 +1,7 @@
 {%extends 'projet/base.html' %}
 
 {% block content %}
-
+    {% for produit in produits %}
         <div class ="produit">
             <h3>{{ produit.nom }}</h3>
             <p>{{ produit.description }}</p>
@@ -18,7 +18,7 @@
             </form>
                 
             {% endfor %}
-
+    {% endfor %}
         </div>
 
 

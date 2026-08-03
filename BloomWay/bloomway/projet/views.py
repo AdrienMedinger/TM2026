@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.conf import settings 
-from .models import Produit, Variante_produit, User, Panier, PanierProduit, Categorie, AdresseCommande
+from .models import Produit, Variante_produit, User, Panier, PanierProduit, Categorie, AdresseCommande, Order, OrderItem
 from .forms import ShippingForm, PaiementForm
 from django.contrib import messages
 def base(request):
@@ -233,6 +233,7 @@ def facturation_info(request):
     # créer une session pour stocker les informations de livraison
     ma_livraison = request.POST
     request.session['ma_livraison'] = ma_livraison
+    request.session.modified = True
 
     print("POST reçu:", request.POST)
 
@@ -251,6 +252,7 @@ def facturation_info(request):
         )
 
     if shipping_form.is_valid():
+
         shipping_info = shipping_form.save(commit=False)
 
         shipping_info.user = request.user
@@ -279,11 +281,60 @@ def paiement (request):
 def process_order(request):
     if request.method != "POST":
         return redirect("facturation_info")
+    
+
+    panier= get_object_or_404(Panier, utilisateur=request.user)
+    panier_produits=PanierProduit.objects.filter(panier=panier)
+
+    total = 0
+
+    for panier_produit in panier_produits:
+        total += (
+             panier_produit.variante_produit.prix*panier_produit.quantite
+
+        )
+
     # prendre les informations de facturation et de paiement du formulaire
     paiement_form = PaiementForm(request.POST or None)
     # prendre les informations de livraison du formulaire
     ma_livraison = request.session.get('ma_livraison')
-    print("ma_livraison:", ma_livraison)
+
+    user = request.user
+    nom_entier = ma_livraison['nom_entier']
+    email = ma_livraison['email']
+    montant_payé = total
+
+
+    # création de adresse de livraison depuis la session ma_livraison
+    shipping_address = f"{ma_livraison['adresse']}\n{ma_livraison['ville']}\n{ma_livraison['code_postal']}\n{ma_livraison['pays']}"
+    
+    # créer une commande
+
+    user = request.user
+
+    créer_commande = Order(user=user, nom_entier=nom_entier, email=email, address=shipping_address, montant_payé=montant_payé)
+    créer_commande.save()
+
+    # ajouter/créer les items de la commande 
+
+    order_id =créer_commande.pk
+    for panier_produit in panier_produits:
+        produit_id = panier_produit.produit.id
+        variante_produit = panier_produit.variante_produit.id
+        prix = panier_produit.variante_produit.prix
+        quantité = panier_produit.quantite
+
+        créer_commande_item = OrderItem(order_id=order_id, produit=produit_id,variante_produit_id=variante_produit,user=user,prix=prix,quantité=quantité )
+        créer_commande_item.save()
+
+
+
+
+
+
+
+
+
 
 
 
