@@ -13,6 +13,7 @@
             <form method="post" action="{% url 'detail' produit.id %}">
                 {% csrf_token %}
                 <button type="submit">Détails</button>
+            </form>
                 <hr>
             {% endfor %}
         </div>

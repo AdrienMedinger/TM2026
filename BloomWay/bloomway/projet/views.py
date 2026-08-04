@@ -319,12 +319,12 @@ def process_order(request):
 
     order_id =créer_commande.pk
     for panier_produit in panier_produits:
-        produit_id = panier_produit.produit.id
+        produit_id = panier_produit.variante_produit.produit.id
         variante_produit = panier_produit.variante_produit.id
-        prix = panier_produit.variante_produit.prix
+        price = panier_produit.variante_produit.prix
         quantité = panier_produit.quantite
 
-        créer_commande_item = OrderItem(order_id=order_id, produit=produit_id,variante_produit_id=variante_produit,user=user,prix=prix,quantité=quantité )
+        créer_commande_item = OrderItem(order_id=order_id, produit_id=produit_id,variante_produit_id=variante_produit,user=user,price=price,quantité=quantité )
         créer_commande_item.save()
 
 
