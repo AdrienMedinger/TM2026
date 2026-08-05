@@ -2,21 +2,23 @@
 
 {% block content %}
 
+
+
 {% for produit in produits %}
         <div>
             <h3>{{ produit.nom }}</h3>
             <p>{{ produit.description }}</p>
 
-
-            {% for variante in produit.variantes.all %}
-            <p> Prix: {{ variante.prix }} CHF</p>
+            <p> Prix: {{ produit.variante_affichee.prix }} CHF</p>
             <form method="post" action="{% url 'detail' produit.id %}">
                 {% csrf_token %}
                 <button type="submit">Détails</button>
             </form>
                 <hr>
-            {% endfor %}
+            
         </div>
+
+    
     {% empty %}
         <p>Aucun produit trouvé.</p>
 

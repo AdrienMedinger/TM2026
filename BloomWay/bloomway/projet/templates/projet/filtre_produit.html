@@ -43,27 +43,24 @@
 
 <hr>
 
-{% for p in produits %}
+{% for produit in produits %}
+        <div>
+            <h3>{{ produit.nom }}</h3>
+            <p>{{ produit.description }}</p>
 
-<div> 
-    <h3> {{ p.nom }}</h3>
-    <p> Catégorie : {{ p.categorie }}</p>
-
-    {% for variante in p.variante.produit %}
-
-    <div> 
-        <p> Taille : {{ variante.taille}}</p>
-        <p> Couleur : {{ variante.couleur }}</p>
-        <p> Stock : {{ variante.stock }}</p>
-        <p> Prix :  {{ variante.prix }}</p>
+            <p> Prix: {{ produit.variante_affichee.prix }} CHF</p>
+            <form method="post" action="{% url 'detail' produit.id %}">
+                {% csrf_token %}
+                <button type="submit">Détails</button>
+            </form>
+                <hr>
+            
+        </div>
     
-    </div>
-    {% endfor%}
-</div>
-<hr>
-{% empty %}
-<p> Aucun produit trouvé </p>
-{% endfor %}
+    {% empty %}
+        <p>Aucun produit trouvé.</p>
+
+    {% endfor %}
 
 {% endblock %}
 

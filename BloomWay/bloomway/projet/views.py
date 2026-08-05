@@ -80,14 +80,29 @@ def affichage_produit(request):
     query = request.GET.get("q", "")
     produits = Produit.objects.all()
 
+    for produit in produits:
+        produit.variante_affichee = produit.variantes.first() # Récupère la première variante du produit
+
+
+    variante_produit=Variante_produit.objects.all()
+
+
+
+    categories = Categorie.objects.all()
+   
+
     if query:
         produits = produits.filter(nom__icontains=query)
 
 
     context = {
-        'produits': produits,
+        'produits': produits.distinct(),
+        'categories': categories,
+        'variantes_produit': variante_produit,
         'query': query,
     }
+
+    
      
     return render(request, 'projet/affichage_produit.html', context)
 
