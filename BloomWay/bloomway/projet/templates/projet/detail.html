@@ -8,16 +8,19 @@
                  alt="{{ produit.nom }}"
                  width="300" height="300">
 
+            {% with variante=produit.variantes.first %}
+                {% if variante %}
+                    <p> Prix: {{ variante.prix }} CHF</p>
+                    <form method="post" action="{% url 'ajouter_au_panier' variante.id  %}">
+                     {% csrf_token %}
+                     <button type="submit">Ajouter au panier</button>
+                    </form>
 
-            {% for variante in produit.variantes.all %}
-            <p> Prix: {{ variante.prix }} CHF</p>
-            <form method="post" action="{% url 'ajouter_au_panier' variante.id  %}">
-                {% csrf_token %}
-                <button type="submit">Ajouter au panier</button>
-            </form>
-                
-            {% endfor %}
-    
+                {% else %}
+                    <p> Prix: Non disponible</p>
+                    
+                {% endif %}
+            {% endwith %}
         </div>
 
 

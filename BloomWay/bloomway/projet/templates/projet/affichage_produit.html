@@ -9,7 +9,14 @@
             <h3>{{ produit.nom }}</h3>
             <p>{{ produit.description }}</p>
 
-            <p> Prix: {{ produit.variante_affichee.prix }} CHF</p>
+            {% with variante=produit.variantes.first %}
+                {% if variante %}
+                    <p> Prix: {{ variante.prix }} CHF</p>
+                {% else %}
+                    <p> Prix: Non disponible</p>
+                {% endif %}
+            {% endwith %}
+            
             <form method="post" action="{% url 'detail' produit.id %}">
                 {% csrf_token %}
                 <button type="submit">Détails</button>

@@ -78,10 +78,11 @@ def home(request):
 
 def affichage_produit(request):
     query = request.GET.get("q", "")
-    produits = Produit.objects.all()
+    produits = Produit.objects.prefetch_related('variantes').all()
 
-    for produit in produits:
-        produit.variante_affichee = produit.variantes.first() # Récupère la première variante du produit
+    if query:
+        produits = produits.filter(nom__icontains=query)
+
 
 
     variante_produit=Variante_produit.objects.all()
@@ -91,9 +92,7 @@ def affichage_produit(request):
     categories = Categorie.objects.all()
    
 
-    if query:
-        produits = produits.filter(nom__icontains=query)
-
+   
 
     context = {
         'produits': produits.distinct(),
