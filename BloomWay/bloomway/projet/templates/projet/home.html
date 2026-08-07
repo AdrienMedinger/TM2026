@@ -8,9 +8,13 @@
         <div class="categorie">
             <img src="{{ categorie.image_principale.url }}" alt="{{ categorie.categorie }}"
                 width="400" height="400">
-            <form method="POST" action="{% url 'filtre_produit' %}">
+            <form method="get" action="{% url 'filtre_produit' %}">
                 {% csrf_token %}
-                <button type="submit">{{ categorie.categorie }}</button>
+                <button type="submit"
+                        name="categorie"
+                        value="{{ categorie.categorie}}">
+                        {{ categorie.categorie }}
+                </button>
             </form>
         </div> 
     {% endfor %}
