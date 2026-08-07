@@ -108,9 +108,30 @@ def affichage_produit(request):
 
 def detail(request, Produit_id=None):
     produit = get_object_or_404(Produit, id=Produit_id)
-    variante= Variante_produit.objects.filter(produit=produit)
+
+    # toutes les variantes du produit
+    variantes= Variante_produit.objects.filter(produit=produit)
+
+    # première variante pas défaut 
+    variante= variantes.first()
+
+    # taille selectiionnée par l'utilisateur
+    taille_selectionnee = request.GET.get('variante')
+    
+    # si l'utilisateur choisi une taille
+    variante_id = request.GET.get('variante')
+    if variante_id:
+        variante_choisie = variantes.filter(id=variante_id).first()
+
+        if variante_choisie:
+            variante=variante_choisie 
+
     context = {
         'produit': produit,
+        'variantes': variantes,
+        'variante':variante,
+        'variantes_id':variante_id,
+        'taille_selectionnee':taille_selectionnee,
     }
     return render(request, 'projet/detail.html', context)
 

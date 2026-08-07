@@ -1,6 +1,7 @@
 {%extends 'projet/base.html' %}
 
 {% block content %}
+        <!-- Détails du produit -->
         <div class ="produit">
             <h3>{{ produit.nom }}</h3>
             <p>{{ produit.description }}</p>
@@ -8,19 +9,40 @@
                  alt="{{ produit.nom }}"
                  width="300" height="300">
 
-            {% with variante=produit.variantes.first %}
+            <!-- choix de la taille qui permet de selectionné une variante -->
+            <div style="clear: both;">
+                {% for v in produit.variantes.all %}
+                    <form methof="get" style="display:inline;">
+                        <button type="submit"
+                                name="variante"
+                                value="{{ v.id }}">
+                            {{ v.taille }}
+                        </button>
+                    </form>
+                {% endfor %}
+            </div>
+
+            <!--Prix -->
                 {% if variante %}
                     <p> Prix: {{ variante.prix }} CHF</p>
-                    <form method="post" action="{% url 'ajouter_au_panier' variante.id  %}">
-                     {% csrf_token %}
-                     <button type="submit">Ajouter au panier</button>
-                    </form>
-
+                   
                 {% else %}
                     <p> Prix: Non disponible</p>
                     
                 {% endif %}
-            {% endwith %}
+
+            <!-- bouton "Ajouter au panier" -->
+            {% if taille_selectionnee %}
+              <form method="post" action="{% url 'ajouter_au_panier' variante.id  %}">
+                     {% csrf_token %}
+                     <button type="submit">Ajouter au panier</button>
+                    </form>
+            {% else %}
+                <p>Veuillez sélectionner une variante pour ajouter au panier.</p>
+                <button type="button" disablesd>Ajouter au panier</button>
+            {% endif %}
+
+            
         </div>
 
 
