@@ -19,8 +19,17 @@
                             {{ v.taille }}
                         </button>
                     </form>
+                    
                 {% endfor %}
             </div>
+            <!-- Stock -->
+             {% if variante %}
+                {% if variante.stock == 0 %}
+                    <span style="color: red;">Rupture de stock</span>
+                {% else %}
+                    <span style="color: green;">En stock</span>
+                {% endif %}
+            {% endif %}
 
             <!--Prix -->
                 {% if variante %}
