@@ -15,6 +15,8 @@ class Produit(models.Model) :
     description = models.TextField()
     categorie = models.ForeignKey(Categorie, on_delete=models.CASCADE, related_name='produits',null=True, blank=True)
     image_principale = models.ImageField(upload_to='produits/', blank=True,null=True)
+    image_secondaire = models.ImageField(upload_to='produits/', blank=True,null=True)
+    image_globale = models.ImageField(upload_to='produits/', blank=True,null=True)
     dispponibilité = models.BooleanField(default=True)
     date_création = models.DateTimeField(auto_now_add=True)
     date_modification = models.DateTimeField(auto_now=True)
