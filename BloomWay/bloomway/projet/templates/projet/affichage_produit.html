@@ -7,7 +7,6 @@
 {% for produit in produits %}
         <div>
             <h3>{{ produit.nom }}</h3>
-            <p>{{ produit.description }}</p>
 
             {% with variante=produit.variantes.first %}
                 {% if variante %}
