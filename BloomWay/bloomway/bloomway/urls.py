@@ -24,22 +24,45 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
     path('base/', projet.views.base, name='base'),
+
     path('login/', projet.views.login_page, name='login'),
+
     path('logout/', projet.views.logout_page, name='logout'),
+
     path('home/', projet.views.home, name='home'),
+
     path('signup/', projet.views.signup_page, name='signup'),
+
     path('filtre_produit/', projet.views.filtre_produit, name='filtre_produit'),
+
     path('panier/', projet.views.affichage_panier, name='affichage_panier'),
+
     path('panier/modifier/<int:variante_produit_id>/<str:action>/', projet.views.modifier_quantite_panier, name='modifier_quantite_panier'),
+
     path('panier/ajouter/<int:variante_produit_id>/', projet.views.ajouter_au_panier, name='ajouter_au_panier'),
+
     path('panier/supprimer/<int:variante_produit_id>/', projet.views.supprimer_du_panier, name='supprimer_du_panier'),
+
     path('checkout/', projet.views.checkout, name='checkout'),
+
     path('about_us/', projet.views.about_us, name='about_us'),
+
     path('affichage_produit/', projet.views.affichage_produit, name='affichage_produit'),
+
     path('detail/<int:Produit_id>/', projet.views.detail, name='detail'),
+
     path('payment_success/', projet.views.payment_success, name='payment_success'),
+
     path('facturation_info', projet.views.facturation_info, name= 'facturation_info'),
+
     path('paiement',projet.views.paiement,name='paiement'),
+
     path('process_order',projet.views.process_order,name='process_order'),
+
+    path('envoye_dashboard',projet.views.envoye_dashboard,name='envoye_dashboard'),
+
+    path('pas_envoye_dashboard',projet.views.pas_envoye_dashboard,name='pas_envoye_dashboard'),
+
  ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

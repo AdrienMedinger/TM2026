@@ -1,6 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, User 
 import datetime 
+from django.db.models.signals import post_save, pre_save 
+from django.dispatch import receiver
+
+
+
 
 class Categorie(models.Model):
     categorie = models.CharField(max_length=100)
@@ -94,12 +99,23 @@ class Order(models.Model):
     montant_payé = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     date_commande = models.DateTimeField(auto_now_add=True)
 
-    status = models.BooleanField(default=False)  # False = pas envoyé, True = envoyé 
+    envoyé = models.BooleanField(default=False)  # False = pas envoyé, True = envoyé 
+    date_envoie = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
         return f"Order - {str(self.id)}"
 
-    
+# auto ajouter la date d'envoi lorsque l'order est marqué comme envoyé
+@receiver(pre_save, sender=Order)
+def set_date_envoie(sender, instance, **kwargs):
+   if instance.pk:
+       now = datetime.datetime.now()
+       obj=sender._default_manager.get(pk=instance.pk)
+       if instance.envoyé and not obj.envoyé:
+              instance.date_envoie = now
+
+
+
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)

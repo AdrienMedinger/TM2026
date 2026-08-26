@@ -363,6 +363,16 @@ def process_order(request):
         créer_commande_item.save()
 
 
+    # vider le panier après la commande
+    panier_produits.delete()
+
+
+def envoye_dashboard(request):
+    pass
+
+
+def pas_envoye_dashboard(request):
+    pass
 
 
 
@@ -374,4 +384,5 @@ def process_order(request):
 
 
 
-    return render(request, 'projet/process_order.html', {'paiement_form': paiement_form, 'ma_livraison': ma_livraison})
+
+

@@ -21,3 +21,20 @@ admin.site.register(Order)
 admin.site.register(OrderItem)
 admin.site.register(Categorie)
 admin.site.register(AdresseCommande)
+
+# créer un orderitem inline
+class OrderItemInline(admin.StackedInline): 
+    model = OrderItem
+    extra = 0
+
+
+# etendre l'admin de Order pour inclure les OrderItem
+class OrderAdmin(admin.ModelAdmin):
+    model = Order
+    readonly_fields = ["date_commande"]
+    fields = ["user", "nom_entier", "email", "address", "montant_payé","date_commande", "envoyé", "date_envoie"]
+    inlines = [OrderItemInline]
+
+
+admin.site.unregister(Order)
+admin.site.register(Order, OrderAdmin)
