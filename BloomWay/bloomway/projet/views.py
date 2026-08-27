@@ -368,12 +368,34 @@ def process_order(request):
 
 
 def envoye_dashboard(request):
-    pass
+
+    if request.user.is_superuser:
+
+    
+        return render(request, 'projet/envoye_dashboard.html')
+    
+    else:
+        messages.success(request, "Accès refusé")
+
+
+        return redirect('home')
+
 
 
 def pas_envoye_dashboard(request):
-    pass
 
+    if request.user.is_superuser and request.user.is_authenticated:
+    
+        
+        return render(request, 'projet/pas_envoye_dashboard.html')
+    
+    else:
+
+        messages.success(request, "Accès refusé")
+
+        return redirect('home')
+    
+   
 
 
 
