@@ -192,7 +192,13 @@ def filtre_produit(request, variante_produit_id = None):
 
 def affichage_panier(request):
     mon_panier, created = Panier.objects.get_or_create(utilisateur=request.user)
-    return render(request, 'projet/panier.html', {'panier': mon_panier})
+
+    mon_panier1 = PanierProduit.objects.filter(panier=mon_panier)
+
+    total = 0
+    for item in mon_panier1:
+        total += item.variante_produit.prix * item.quantite
+    return render(request, 'projet/panier.html', {'panier': mon_panier, 'total': total, 'mon_panier1': mon_panier1})
 
 def ajouter_au_panier(request, variante_produit_id):
     if request.method == 'POST':
@@ -385,13 +391,24 @@ def envoye_dashboard(request):
 def pas_envoye_dashboard(request):
 
     if request.user.is_superuser and request.user.is_authenticated:
-    
+        orders = Order.objects.filter(envoyé=False)
         
-        return render(request, 'projet/pas_envoye_dashboard.html')
+        return render(request, 'projet/pas_envoye_dashboard.html', {'orders': orders})
     
     else:
+        orders = Order.objects.filter(envoyé=True)
+        messages.success(request, "Accès refusé", {"orders": orders})
 
-        messages.success(request, "Accès refusé")
+        return redirect('home')
+
+
+def commande(request, order_id):
+    if request.user.is_superuser and request.user.is_authenticated:
+        order = Order.objects.get(id=request.GET.get('order_id'))
+        return render(request, 'projet/commande.html', {'order': order})
+
+
+    else:
 
         return redirect('home')
     

@@ -20,7 +20,9 @@
         <td>{{ item.variante_produit.taille }}</td>
         <td>{{ item.variante_produit.couleur }}</td>
         <td>{{ item.variante_produit.prix }} Fr </td>
-         <td>{{ item.quantite }}</td>
+        <td>{{ item.quantite }}</td>
+        <td>{{ total }} Fr</td>
+
         
         <td>
             <a href="{% url 'modifier_quantite_panier' item.variante_produit.id 'augmenter' %}">+</a>
@@ -30,6 +32,12 @@
     </tr>
     {% endfor %}
 </table>
+<style>
+    th, td{
+        padding: 5px 30px;
+
+    }
+</style>
 <a href="{% url 'checkout'%}">Passer commande</a>
 {% else %}
 <p>Votre panier est vide.</p>
