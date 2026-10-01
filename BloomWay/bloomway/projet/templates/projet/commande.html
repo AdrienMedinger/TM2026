@@ -1,0 +1,14 @@
+{% extends 'projet/base.html' %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-8">
+<h3>Commande</h3>
+    order {{ order.id }}<br> - {{ order.montant_payé }} Fr
+
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

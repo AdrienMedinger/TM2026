@@ -99,6 +99,7 @@ class Order(models.Model):
     montant_payé = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     date_commande = models.DateTimeField(auto_now_add=True)
 
+    payé = models.BooleanField(default=False)  # False = pas payé, True = payé
     envoyé = models.BooleanField(default=False)  # False = pas envoyé, True = envoyé 
     date_envoie = models.DateTimeField(blank=True, null=True)
 
@@ -118,8 +119,8 @@ def set_date_envoie(sender, instance, **kwargs):
 
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE)
-    produit = models.ForeignKey(Produit, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
+    produit = models.ForeignKey(Produit, on_delete=models.SET_NULL, null=True) # SET_NUL pour ne pas perdre l'historique des commandes si le produit est supprimé
     variante_produit = models.ForeignKey(Variante_produit, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)

@@ -8,6 +8,20 @@ from django.conf import settings
 from .models import Produit, Variante_produit, User, Panier, PanierProduit, Categorie, AdresseCommande, Order, OrderItem
 from .forms import ShippingForm, PaiementForm
 from django.contrib import messages
+from django.db import transaction
+from django.db.models import F
+from django.contrib.admin.views.decorators import staff_member_required
+from django.views.decorators.http import require_POST
+
+
+
+
+
+
+
+
+
+
 def base(request):
 
     produits = Produit.objects.all()
@@ -189,7 +203,7 @@ def filtre_produit(request, variante_produit_id = None):
     print("CATEGORIES=",list(categories))
     return render(request, 'projet/filtre_produit.html', context)
 
-
+@login_required
 def affichage_panier(request):
     mon_panier, created = Panier.objects.get_or_create(utilisateur=request.user)
 
@@ -199,6 +213,13 @@ def affichage_panier(request):
     for item in mon_panier1:
         total += item.variante_produit.prix * item.quantite
     return render(request, 'projet/panier.html', {'panier': mon_panier, 'total': total, 'mon_panier1': mon_panier1})
+
+def panier_et_total(user):
+    panier = Panier.objects.get_or_create(utilisateur=user)
+    items = PanierProduit.objects.filter(panier=panier).select_related('variante_produit')
+    total = sum(item.variante_produit.prix * item.quantite for item in items)
+    return panier, items, total
+
 
 def ajouter_au_panier(request, variante_produit_id):
     if request.method == 'POST':
@@ -242,71 +263,56 @@ def payment_success(request):
     return render(request, 'projet/payment_success.html')
 
 def checkout(request):
-    panier= get_object_or_404(Panier, utilisateur=request.user)
-    panier_produits=PanierProduit.objects.filter(panier=panier)
+    panier, items, total = panier_et_total(request.user)
+   
+    if not items.exists():
+        messages.info(request, " votre panier est vide. ")
+        return redirect('affichage_panier')
 
-    if not panier_produits.exists():
-        return redirect('panier')
-    
+    adresse = AdresseCommande.objects.filter(user=request.user).first()
+    shipping_form = ShippingForm(request.POST or None, instance=adresse)
     total = 0
 
-    for panier_produit in panier_produits:
-        total += (
-            panier_produit.variante_produit.prix*panier_produit.quantite
-
-        )
-
-    if request.user.is_authenticated:
-        # checkout comme utilisateur enregistré
-        shipping_user= AdresseCommande.objects.filter(user__id= request.user.id).first()
-        shipping_form = ShippingForm(request.POST or None, instance= shipping_user)
-        return render(request, 'projet/checkout.html', {'panier': panier, 'panier_produits': panier_produits,'total': total,'shipping_form':shipping_form})
+   
+    return render(request, 'projet/checkout.html', {'panier': panier, 'panier_produits': items,'total': total,'shipping_form':shipping_form})
     
     
 
-
+@login_required
 def facturation_info(request):
     if request.method != "POST":
         return redirect("checkout")
-    panier= get_object_or_404(Panier, utilisateur=request.user)
-    panier_produits=PanierProduit.objects.filter(panier=panier)
 
-    # créer une session pour stocker les informations de livraison
-    ma_livraison = request.POST
-    request.session['ma_livraison'] = ma_livraison
-    request.session.modified = True
+    panier, items, total = panier_et_total(request.user)
+    if not items.exists():
+        messages.info(request, "Votre panier est vide.")
+        return redirect('affichage_panier')
 
-    print("POST reçu:", request.POST)
+    adresse = AdresseCommande.objects.filter(user=request.user).first()
+    shipping_form = ShippingForm(request.POST or None, instance=adresse)
 
-    shipping_form = ShippingForm(request.POST)
+    if not shipping_form.is_valid():
+        messages.error(request, "Veuillez remplir correctement le formulaire de livraison.")
+        return render(request, 'projet/checkout.html', {'panier': panier, 'panier_produits': items,'total': total,'shipping_form':shipping_form})
 
-    paiement_form = PaiementForm()
+
+    shipping_info = shipping_form.save(commit=False)
+    shipping_info.user = request.user
+    shipping_info.save()
 
     
+    # créer une session pour stocker les informations de livraison
+    request.session['ma_livraison'] = {
+        'nom_entier': shipping_info.nom_entier,
+        'email': shipping_info.email,
+        'adresse': shipping_info.adresse,
+        'ville': shipping_info.ville,
+        'code_postal': shipping_info.code_postal,
+        'pays': shipping_info.pays,
+    }
 
-    total = 0
-
-    for panier_produit in panier_produits:
-        total += (
-             panier_produit.variante_produit.prix*panier_produit.quantite
-
-        )
-
-    if shipping_form.is_valid():
-
-        shipping_info = shipping_form.save(commit=False)
-
-        shipping_info.user = request.user
-        shipping_info.email = request.user.email
-
-        shipping_info.save()
-
-        
-
-        return render (request, 'projet/facturation_info.html',{'panier': panier, 'panier_produits': panier_produits,'total':total,'shipping_info': shipping_info, 'paiement_form': paiement_form})
-        
-    return render (request, 'projet/checkout.html',{'panier': panier, 'panier_produits': panier_produits,'total':total,'shipping_form': shipping_form, 'paiement_form': paiement_form})
-
+  
+    return render (request, 'projet/checkout.html',{'panier': panier, 'panier_produits': items,'total':total,'shipping_form': shipping_form, 'paiement_form': PaiementForm()})
 
     
 def paiement (request):
@@ -318,23 +324,29 @@ def paiement (request):
             
     
     return render(request,'projet/paiement.html', {"shipping_info" : shipping_info})
-
+@login_required
+@require_POST
 def process_order(request):
     if request.method != "POST":
         return redirect("facturation_info")
     
+    panier, items, total = panier_et_total(request.user)
 
-    panier= get_object_or_404(Panier, utilisateur=request.user)
-    panier_produits=PanierProduit.objects.filter(panier=panier)
+    livraison = request.session.get('ma_livraison')
 
-    total = 0
+    if not livraison or not items.exists():
+        messages.error(request, "Votre panier est vide ou les informations de livraison sont manquantes.")
+        return redirect('checkout')
 
-    for panier_produit in panier_produits:
-        total += (
-             panier_produit.variante_produit.prix*panier_produit.quantite
+    adresses_txt = f"{livraison['adresse']}\n{livraison['ville']}\n{livraison['code_postal']}\n{livraison['pays']}"
 
-        )
-
+    with transaction.atomic():  # soit tout est créer soit rien
+        # vérifier le stock (vérouillé pour eviter deux achats simultanés du même produit)
+        for item in items:
+            variante = Variante_produit.objects.select_for_update().get(id=item.variante_produit.id)
+            if variante.stock < item.quantite:
+                messages.error(request, f"Le produit {variante.produit.nom} n'a pas assez de stock.")
+                return redirect('affichage_panier')
     # prendre les informations de facturation et de paiement du formulaire
     paiement_form = PaiementForm(request.POST or None)
     # prendre les informations de livraison du formulaire
@@ -402,10 +414,12 @@ def pas_envoye_dashboard(request):
         return redirect('home')
 
 
-def commande(request, order_id):
+def commande(request, pk):
     if request.user.is_superuser and request.user.is_authenticated:
-        order = Order.objects.get(id=request.GET.get('order_id'))
-        return render(request, 'projet/commande.html', {'order': order})
+        order = Order.objects.get(id=pk)
+
+        items = OrderItem.objects.filter(order= pk )
+        return render(request, 'projet/commande.html', {'order': order, 'items': items})
 
 
     else:

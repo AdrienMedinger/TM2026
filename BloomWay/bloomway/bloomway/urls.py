@@ -65,6 +65,6 @@ urlpatterns = [
 
     path('pas_envoye_dashboard',projet.views.pas_envoye_dashboard,name='pas_envoye_dashboard'),
 
-    path('commande/<int:order_id>/', projet.views.commande, name='commande'),
+    path('commande/<int:pk>/', projet.views.commande, name='commande'),
 
  ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
