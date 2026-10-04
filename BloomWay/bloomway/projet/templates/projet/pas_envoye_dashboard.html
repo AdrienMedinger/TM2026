@@ -1,6 +1,6 @@
 {% extends 'projet/base.html' %}
 
-{% include 'projet/navbar.html' %}
+
 {% block content %}
 
 <!-- header -->
@@ -13,6 +13,7 @@
                         <br></br>
 
                     </div>
+                </center>
             </div>
         </div>
 
@@ -33,14 +34,22 @@
             </tr>
             {% for item in orders %}
             <tr>
-                <td><a href="{% url 'commande' order_id=item.id %}">{{ item.id }}</a></td>
+                <td><a href="{% url 'commande' item.id %}">{{ item.id }}</a></td>
                 <td>{{ item.montant_payé }} Fr </td>
                 <td>{{ item.email }}</td>
                 <td>{{ item.date_commande }}</td>
-                
+                <td>
+                    <form method="post" action="{% url 'pas_envoye_dashboard' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="order_id" value="{{ item.id }}">
+                        <button type="submit">Marquer comme envoyé</button>
+                    </form>
+
+                </td>
+            </tr>
             {% endfor %}
                 
-            </tr>
+           
    
     </table>
     <style>

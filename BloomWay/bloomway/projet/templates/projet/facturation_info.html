@@ -1,42 +1,43 @@
+{% extends 'projet/base.html' %}
+
+
 {% block content %}
 <h1> info de facturation</h1>
-<div class ="container">
-    <div class ="row">
-        <div class="col-md-6">
-    </div>
-</div>
 
 <div class="card">
   <div class="card-header">
-    Formulaire de paiement
+    <strong>Recapitulatif de la commande</strong>
   </div>
   <br></br>
   <div class="card-body">
     {% for panier_produit in panier_produits %}
         <strong>Produit: {{ panier_produit.variante_produit.produit.nom }}</strong>
 
-        <small> Quantité: {{ panier_produit.quantite }}</small>
+        <small> 
+            ({{ panier_produit.variante_produit.taille }} - {{ panier_produit.variante_produit.couleur }})
+            Quantité: {{ panier_produit.quantite }}
+            -  {{ panier_produit.variante_produit.prix }} Fr / pièce 
+        </small>
 
         <br></br>
 
     {% endfor %}
 
-    Total: {{total}}
+    <strong>Total: {{total}} Fr</strong>
         <br></br>
 
-   
   </div>
 </div>
+
+
+
 <div class="card">
    
     <div class="card-header">
      <strong>info de livraison</strong>
     </div>
     <div class="card-body">
-        <form method ="POST" action="{% url 'facturation_info' %}">
-            {% csrf_token %}
-        </form>
-
+        
     Nom entier: <small>{{ shipping_info.nom_entier }}</small>
 
     <br></br>
@@ -73,22 +74,13 @@
      <strong>info de paiement</strong>
     </div>
     <div class="card-body">
-
-        {{ paiement_form.as_p}}
+        <form method="POST" action="{% url 'process_order' %}">
+            {% csrf_token %}
+            {{ paiement_form.as_p }}
+            <button type="submit">Payer {{ total }} Fr  </button>
+        </form>
 
     </div>
-</div>
-<br></br>
-<div>
-    <form method="POST" action="{% url 'process_order' %}">
-        {% csrf_token %}
-        <input
-            type="hidden"
-            name="shipping_id"
-            value="{{ shipping_info.id }}"
-            >
-        <button type="submit">Payer</button>
-    </form>
 </div>
 
 {% endblock %}

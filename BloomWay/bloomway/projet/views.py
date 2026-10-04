@@ -215,7 +215,7 @@ def affichage_panier(request):
     return render(request, 'projet/panier.html', {'panier': mon_panier, 'total': total, 'mon_panier1': mon_panier1})
 
 def panier_et_total(user):
-    panier = Panier.objects.get_or_create(utilisateur=user)
+    panier, created = Panier.objects.get_or_create(utilisateur=user)
     items = PanierProduit.objects.filter(panier=panier).select_related('variante_produit')
     total = sum(item.variante_produit.prix * item.quantite for item in items)
     return panier, items, total
@@ -262,6 +262,7 @@ def modifier_quantite_panier(request, variante_produit_id, action):
 def payment_success(request):
     return render(request, 'projet/payment_success.html')
 
+@login_required
 def checkout(request):
     panier, items, total = panier_et_total(request.user)
    
@@ -271,7 +272,6 @@ def checkout(request):
 
     adresse = AdresseCommande.objects.filter(user=request.user).first()
     shipping_form = ShippingForm(request.POST or None, instance=adresse)
-    total = 0
 
    
     return render(request, 'projet/checkout.html', {'panier': panier, 'panier_produits': items,'total': total,'shipping_form':shipping_form})
@@ -312,7 +312,7 @@ def facturation_info(request):
     }
 
   
-    return render (request, 'projet/checkout.html',{'panier': panier, 'panier_produits': items,'total':total,'shipping_form': shipping_form, 'paiement_form': PaiementForm()})
+    return render (request, 'projet/facturation_info.html',{'panier': panier, 'panier_produits': items,'total':total,'shipping_info': shipping_info, 'paiement_form': PaiementForm()})
 
     
 def paiement (request):
@@ -347,87 +347,78 @@ def process_order(request):
             if variante.stock < item.quantite:
                 messages.error(request, f"Le produit {variante.produit.nom} n'a pas assez de stock.")
                 return redirect('affichage_panier')
-    # prendre les informations de facturation et de paiement du formulaire
-    paiement_form = PaiementForm(request.POST or None)
-    # prendre les informations de livraison du formulaire
-    ma_livraison = request.session.get('ma_livraison')
-
-    user = request.user
-    nom_entier = ma_livraison['nom_entier']
-    email = ma_livraison['email']
-    montant_payé = total
 
 
-    # création de adresse de livraison depuis la session ma_livraison
-    shipping_address = f"{ma_livraison['adresse']}\n{ma_livraison['ville']}\n{ma_livraison['code_postal']}\n{ma_livraison['pays']}"
-    
-    # créer une commande
+        # créer la commande
 
-    user = request.user
+        order = Order.objects.create(
+            user=request.user,
+            nom_entier=livraison['nom_entier'],
+            email=livraison['email'],
+            address=adresses_txt,
+            montant_payé=total,
+            payé=True,  # marquer comme payé
+        )
 
-    créer_commande = Order(user=user, nom_entier=nom_entier, email=email, address=shipping_address, montant_payé=montant_payé)
-    créer_commande.save()
+        # baisser le stock à chaque commande 
 
-    # ajouter/créer les items de la commande 
+        for item in items:
+            variante =item.variante_produit
+            OrderItem.objects.create(
+                order=order,
+                produit=variante.produit,
+                variante_produit=variante,
+                user=request.user,
+                price=variante.prix,
+                quantité=item.quantite,
+            )
+            Variante_produit.objects.filter(pk=variante.pk).update(stock=F('stock') - item.quantite)
 
-    order_id =créer_commande.pk
-    for panier_produit in panier_produits:
-        produit_id = panier_produit.variante_produit.produit.id
-        variante_produit = panier_produit.variante_produit.id
-        price = panier_produit.variante_produit.prix
-        quantité = panier_produit.quantite
+        # vider le panier après la commande
+        items.delete()
 
-        créer_commande_item = OrderItem(order_id=order_id, produit_id=produit_id,variante_produit_id=variante_produit,user=user,price=price,quantité=quantité )
-        créer_commande_item.save()
-
-
-    # vider le panier après la commande
-    panier_produits.delete()
-
-
-def envoye_dashboard(request):
-
-    if request.user.is_superuser:
-
-    
-        return render(request, 'projet/envoye_dashboard.html')
-    
-    else:
-        messages.success(request, "Accès refusé")
-
-
-        return redirect('home')
+    request.session.pop('ma_livraison', None)  # supprimer les informations de livraison de la session
+    messages.success(request, "Votre commande a été traitée avec succès.")
+    return redirect('payment_success')
 
 
 
+# --------- tout ce qui est pour les admin -----------------
+
+
+@staff_member_required
 def pas_envoye_dashboard(request):
 
-    if request.user.is_superuser and request.user.is_authenticated:
-        orders = Order.objects.filter(envoyé=False)
-        
-        return render(request, 'projet/pas_envoye_dashboard.html', {'orders': orders})
-    
-    else:
-        orders = Order.objects.filter(envoyé=True)
-        messages.success(request, "Accès refusé", {"orders": orders})
+    if request.method == 'POST':
+       order = get_object_or_404(Order, id=request.POST.get('order_id'))
+       order.envoyé = True
+       order.save()    # save() et pas update() pour que cela remplisse date_envoie
+       messages.success(request, f"La commande {order.id} a été marquée comme envoyée.")
 
-        return redirect('home')
+    orders = Order.objects.filter(envoyé=False).order_by('-date_commande')
+    return render(request, 'projet/pas_envoye_dashboard.html', {'orders': orders})
 
 
+@staff_member_required
+def envoye_dashboard(request):
+
+    if request.method == 'POST':
+       order = get_object_or_404(Order, id=request.POST.get('order_id'))
+       order.envoyé = False
+       order.save()    # save() et pas update() pour que cela remplisse date_envoie
+       messages.success(request, f"La commande {order.id} a été marquée comme non envoyée.")
+
+    orders = Order.objects.filter(envoyé=True).order_by('-date_commande')
+    return render(request, 'projet/envoye_dashboard.html', {'orders': orders})
+
+
+@staff_member_required
 def commande(request, pk):
-    if request.user.is_superuser and request.user.is_authenticated:
-        order = Order.objects.get(id=pk)
+    order = get_object_or_404(Order, id=pk)
+    items = order.items.select_related('produit', 'variante_produit')
 
-        items = OrderItem.objects.filter(order= pk )
-        return render(request, 'projet/commande.html', {'order': order, 'items': items})
-
-
-    else:
-
-        return redirect('home')
+    return render(request, 'projet/commande.html', {'order': order, 'order_items': items})
     
-   
-
 
 
 

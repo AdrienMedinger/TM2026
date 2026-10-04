@@ -1,6 +1,6 @@
 {% extends 'projet/base.html' %}
 
-{% include 'projet/navbar.html' %}
+
 {% block content %}
 
 <!-- header -->
@@ -16,7 +16,7 @@
 
 
                     </div>
-             
+                </center>
             </div>
         </div>
 <h3>Item Envoyé</h3>
@@ -32,10 +32,17 @@
             </tr>
             {% for item in orders %}
             <tr>
-                <td><a href="{% url 'commande' order_id=item.id %}">{{ item.id }}</a></td>
+                <td><a href="{% url 'commande' item.id %}">{{ item.id }}</a></td>
                 <td>{{ item.montant_payé }} Fr </td>
                 <td>{{ item.email }}</td>
-                <td>{{ item.date_envoi }}</td>
+                <td>{{ item.date_envoie }}</td>
+                <td>
+                    <form method="post" action="{% url 'envoye_dashboard' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="order_id" value="{{ item.id }}">
+                        <button type="submit">Marquer comme non envoyé</button>
+                    </form>
+                </td>
                 
             {% endfor %}
                 

@@ -1,7 +1,7 @@
 from django import forms 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
-from .models import AdresseCommande
+from .models import AdresseCommande, Order
 
 class loginForm(forms.Form):
     username = forms.CharField(label='Nom d utilisateur', max_length=64)
