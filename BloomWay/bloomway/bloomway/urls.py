@@ -67,4 +67,8 @@ urlpatterns = [
 
     path('commande/<int:pk>/', projet.views.commande, name='commande'),
 
+    path('mes_commandes/', projet.views.mes_commandes, name='mes_commandes'),
+
+    path('ma_commande/<int:pk>/', projet.views.ma_commande, name='ma_commande'),
+
  ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

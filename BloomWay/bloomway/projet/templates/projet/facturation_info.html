@@ -74,10 +74,11 @@
      <strong>info de paiement</strong>
     </div>
     <div class="card-body">
+        <p> Démonstration (travail de maturité) : aucun paiement réel n'est effectué </p>
         <form method="POST" action="{% url 'process_order' %}">
             {% csrf_token %}
             {{ paiement_form.as_p }}
-            <button type="submit">Payer {{ total }} Fr  </button>
+            <button type="submit">confirmer la commande ({{ total }} Fr)</button>
         </form>
 
     </div>

@@ -382,6 +382,22 @@ def process_order(request):
     return redirect('payment_success')
 
 
+def mes_commandes(request):
+   
+    orders = Order.objects.filter(user=request.user).order_by('-date_commande')
+    return render(request, 'projet/mes_commandes.html', {'orders': orders})
+
+
+def ma_commande(request,pk):
+    order = get_object_or_404(Order, id=pk, user=request.user)
+    items = order.items.select_related('produit', 'variante_produit')
+
+    return render(request, 'projet/ma_commande.html', {'order': order, 'order_items': items})
+   
+
+
+
+
 
 # --------- tout ce qui est pour les admin -----------------
 
