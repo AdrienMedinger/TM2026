@@ -1,0 +1,30 @@
+{% extends 'projet/base.html' %}
+
+{% block content %}
+
+<h1>Mes commandes</h1>
+<table>
+    <tr>
+        <th>Numéro de commande :</th>
+        <th>Date de commande :</th>
+        <th>Montant total :</th>
+        <th>Statut :</th>
+    </tr>
+    {% for order in orders %}
+    <tr>
+        <td><a href="{% url 'ma_commande' order.id %}">{{ order.id }}</a></td>
+        <td>{{ order.date_commande|date:"d.m.Y" }}</td>
+        <td>{{ order.total }} Fr</td>
+        <td>{% if order.envoye %}Envoyée le {{ order.date_envoi|date:"d.m.Y" }}
+            {% else %}En cours {% endif %}
+        </td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="4">vous n'avez pas encore passé de commande.</td>
+    </tr>
+    {% endfor %}
+
+</table>    
+
+{% endblock %}

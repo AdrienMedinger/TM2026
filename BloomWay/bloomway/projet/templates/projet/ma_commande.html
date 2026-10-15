@@ -1,0 +1,34 @@
+{% extends 'projet/base.html' %}
+
+ {% block content %}
+ <h1>Commande n°{{ order.id }}</h1> 
+ <p> Passée le {{ order.date_commande|date:"d.m.Y" }}</p>
+ <br>
+ <p> {{ order.adresse|linebreaks }}</p>
+
+
+ <table>
+    <tr>
+        <th>Produit</th>
+        <th>Couleur</th>
+        <th>Taille</th>
+        <th>Quantité</th>
+        <th>Prix</th>
+       
+       
+    </tr>
+    {% for items in order_items %}
+    <tr>
+        <td>{{ items.produit.nom }}</td>
+        <td>{{ items.variante_produit.couleur }}</td>
+        <td>{{ items.variante_produit.taille }}</td>
+        <td>{{ items.quantité }}</td>
+        <td>{{ items.variante_produit.prix }} Fr</td>
+    </tr>
+    {% endfor %}
+ </table>
+
+ <p><strong>Total: {{ total }} Fr</strong></p>
+ <a href="{% url 'mes_commandes' %}" class="btn btn-primary">Retour à mes commandes </a>
+ 
+ {% endblock %}

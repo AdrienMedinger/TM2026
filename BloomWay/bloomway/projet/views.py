@@ -12,6 +12,7 @@ from django.db import transaction
 from django.db.models import F
 from django.contrib.admin.views.decorators import staff_member_required
 from django.views.decorators.http import require_POST
+from django.core.mail import send_mail
 
 
 
@@ -220,7 +221,7 @@ def panier_et_total(user):
     total = sum(item.variante_produit.prix * item.quantite for item in items)
     return panier, items, total
 
-
+@login_required
 def ajouter_au_panier(request, variante_produit_id):
     if request.method == 'POST':
         variante = get_object_or_404(Variante_produit, id=variante_produit_id)
@@ -231,10 +232,14 @@ def ajouter_au_panier(request, variante_produit_id):
             defaults={'quantite': 0}
         )
 
-        panier_produit.quantite += 1
-        panier_produit.save()
+        if panier_produit.quantite >= variante.stock:
+            messages.error(request, f"Le produit {variante.produit.nom} n'a pas assez de stock.")
+        else:
+            panier_produit.quantite += 1
+            panier_produit.save()
     return redirect('affichage_panier')
 
+@login_required
 def supprimer_du_panier(request, variante_produit_id):
     variante = get_object_or_404(Variante_produit, id=variante_produit_id)
     panier = get_object_or_404(Panier, utilisateur=request.user)
@@ -242,6 +247,7 @@ def supprimer_du_panier(request, variante_produit_id):
     panier_produit.delete()
     return redirect('affichage_panier')
 
+@login_required
 def modifier_quantite_panier(request, variante_produit_id, action):
     variante = get_object_or_404(Variante_produit, id=variante_produit_id)
     panier = get_object_or_404(Panier, utilisateur=request.user)
@@ -377,23 +383,33 @@ def process_order(request):
         # vider le panier après la commande
         items.delete()
 
+
+        send_mail(
+            subject=f" confirmation de votre commande numéro {order.id}",
+            message=f"Bonjour {order.nom_entier},\n\nMerci pour votre commande.",
+            from_email="boutique@bloomway.ch",
+            recipient_list=[order.email]
+        )
+
+
+
     request.session.pop('ma_livraison', None)  # supprimer les informations de livraison de la session
     messages.success(request, "Votre commande a été traitée avec succès.")
-    return redirect('payment_success')
+    return redirect('ma_commande', pk=order.id)
 
-
+@login_required
 def mes_commandes(request):
-   
+    total = panier_et_total(request.user)
     orders = Order.objects.filter(user=request.user).order_by('-date_commande')
-    return render(request, 'projet/mes_commandes.html', {'orders': orders})
+    return render(request, 'projet/mes_commandes.html', {'orders': orders, 'total': total})
 
-
+@login_required
 def ma_commande(request,pk):
     order = get_object_or_404(Order, id=pk, user=request.user)
     items = order.items.select_related('produit', 'variante_produit')
+    total = sum(item.price * item.quantité for item in items)
 
-    return render(request, 'projet/ma_commande.html', {'order': order, 'order_items': items})
-   
+    return render(request, 'projet/ma_commande.html', {'order': order, 'order_items': items, 'total': total})
 
 
 
@@ -432,8 +448,8 @@ def envoye_dashboard(request):
 def commande(request, pk):
     order = get_object_or_404(Order, id=pk)
     items = order.items.select_related('produit', 'variante_produit')
-
-    return render(request, 'projet/commande.html', {'order': order, 'order_items': items})
+    total = panier_et_total(request.user)
+    return render(request, 'projet/commande.html', {'order': order, 'order_items': items, 'total': total})
     
 
 
