@@ -3,22 +3,52 @@
 
 {% block content %}
 
+<style>
+    .carte-categorie {
+        position: relative;
+        display: block;
+        overflow: hidden;
+        border-radius: 8px;
+    }
+    .carte-categorie img {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;        
+        transition: transform 0.4s;
+    }
+    .carte-categorie .voile {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-color: rgba(0, 0, 0, 0.35);  
+        transition: background-color 0.4s;
+    }
+    .carte-categorie .nom-categorie {
+        color: white;
+        font-family: 'Playfair Display', serif;
+        font-size: 42px;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        white-space: nowrap;
+    }
+    /* effet au survol */
+    .carte-categorie:hover img { transform: scale(1.05); }
+    .carte-categorie:hover .voile { background-color: rgba(0, 0, 0, 0.55); }
+</style>
 
+
+<div class="w3-row-padding w3-padding-32 ">
     {% for categorie in categories %}
-        <div class="categorie">
-            <img src="{{ categorie.image_principale.url }}" alt="{{ categorie.categorie }}"
-                width="400" height="400">
-            <form method="get" action="{% url 'filtre_produit' %}">
-                {% csrf_token %}
-                <button type="submit"
-                        name="categorie"
-                        value="{{ categorie.categorie}}">
-                        {{ categorie.categorie }}
-                </button>
-            </form>
+        <div class="w3-third w3-margin-bottom">
+            <a href="{% url 'filtre_produit' %}?categorie={{ categorie.categorie|urlencode }}"
+               class="carte-categorie w3-display-container w3-hover-shadow">
+                <img src="{{ categorie.image_principale.url }}" alt="{{ categorie.categorie }}">
+                <div class="voile"></div>
+                <span class="w3-display-middle nom-categorie">{{ categorie.categorie }}</span>
+            </a>
         </div> 
     {% endfor %}
-
+</div>
 {% endblock %}
 
 
