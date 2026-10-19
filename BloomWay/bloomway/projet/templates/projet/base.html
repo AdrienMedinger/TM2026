@@ -15,27 +15,31 @@
     <h1>BloomWay</h1>
 
     {% include 'projet/navbar.html' %}
-    <div class="ligne">
+    <div class="w3-bar w3-light-grey">
+
+    <!-- Filtre des produits -->
+    
+            <a href="{% url 'filtre_produit'%}" class="w3-bar-item w3-button w3-large">&#9776;</a>
+
+
+
+
     <!-- Formulaire de recherche -->
-        <div>
-            <form method="get" action="{% url 'affichage_produit' %}"> 
-                <input type ="text" name="q" placeholder="Rechercher un produit" value="{{ query|default:''    }}">
-                <button type="submit">&#128269;</button>
-        </div>
+        
+            <form class="w3-bar-item" method="get" action="{% url 'affichage_produit' %}"> 
+                <input class="w3-border w3-round" type ="text" name="q" placeholder="Rechercher un produit" value="{{ query|default:''    }}">
+                <button class="w3-button w3-white w3-border w3-round" type="submit">&#128269;</button>
                     
             </form>
 
-    <!-- Filtre des produits -->
-        <div>
-            <a href="{% url 'filtre_produit'%}">&#9776;</a>
-        </div>
-
+    
     <!-- Lien vers le panier -->
         <div>
-            <a href="{% url 'affichage_panier' %}"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="gray" sttroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                                                    <path d="M6 8h12l1 13H5L6 8Z"/>
-                                                        <path d="M9 9V6a3 3 0 0 1 6 0v3"/>
-                                                    </svg>
+            <a href="{% url 'affichage_panier' %}" class="w3-bar-items w3-button w3-right">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="gray" sttroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 8h12l1 13H5L6 8Z"/>
+                    <path d="M9 9V6a3 3 0 0 1 6 0v3"/>
+                </svg>
             </a>
         </div>
     </div>
