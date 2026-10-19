@@ -9,6 +9,16 @@
     </ul>
 </nav>
 
+{% if user.is_authenticated %}
+    <nav>
+        <ul>
+            <li><a href="{% url 'mes_commandes' %}">Mes commandes</a></li>
+            <li><a href="{% url 'logout' %}">Déconnexion</a></li>
+        </ul>
+        
+ 
+{% endif %}
+
 {% if request.user.is_superuser %}
    
     <nav>

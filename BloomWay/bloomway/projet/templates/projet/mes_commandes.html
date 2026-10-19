@@ -1,30 +1,39 @@
 {% extends 'projet/base.html' %}
 
 {% block content %}
-
+<div class="w3-container w3-padding-32">
 <h1>Mes commandes</h1>
-<table>
-    <tr>
-        <th>Numéro de commande :</th>
-        <th>Date de commande :</th>
-        <th>Montant total :</th>
-        <th>Statut :</th>
-    </tr>
-    {% for order in orders %}
-    <tr>
-        <td><a href="{% url 'ma_commande' order.id %}">{{ order.id }}</a></td>
-        <td>{{ order.date_commande|date:"d.m.Y" }}</td>
-        <td>{{ order.total }} Fr</td>
-        <td>{% if order.envoye %}Envoyée le {{ order.date_envoi|date:"d.m.Y" }}
-            {% else %}En cours {% endif %}
-        </td>
-    </tr>
-    {% empty %}
-    <tr>
-        <td colspan="4">vous n'avez pas encore passé de commande.</td>
-    </tr>
-    {% endfor %}
+    <div class="w3-responsive w3-card-4">
+        <table class="w3-table w3-striped w3-bordered w3-hoverable">
+            <thead>
+                <tr>
+                    <th>Numéro de commande :</th>
+                    <th>Date de commande :</th>
+                    <th>Montant total :</th>
+                    <th>Statut :</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for order in orders %}
+            <tr>
+                <td><a href="{% url 'ma_commande' order.id %}">{{ order.id }}</a></td>
+                <td>{{ order.date_commande|date:"d.m.Y" }}</td>
+                <td>{{ order.montant_payé }} Fr</td>
+                <td>
+                    {% if order.envoye %}
+                       <span class="w3-tag w3-round. w3-green"> Envoyé le {{ order.date_envoi|date:"d.m.Y" }}</span>
+                    {% else %}
+                        <span class="w3-tag w3-round. w3-amber">En cours</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="w3-center w3-text-grey">vous n'avez pas encore passé de commande.</td>
+            </tr>
+            {% endfor %}
 
-</table>    
-
+        </table>  
+    </div>  
+</div>
 {% endblock %}

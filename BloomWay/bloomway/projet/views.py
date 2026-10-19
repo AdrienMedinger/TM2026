@@ -399,9 +399,9 @@ def process_order(request):
 
 @login_required
 def mes_commandes(request):
-    total = panier_et_total(request.user)
+    
     orders = Order.objects.filter(user=request.user).order_by('-date_commande')
-    return render(request, 'projet/mes_commandes.html', {'orders': orders, 'total': total})
+    return render(request, 'projet/mes_commandes.html', {'orders': orders})
 
 @login_required
 def ma_commande(request,pk):
