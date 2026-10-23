@@ -3,44 +3,78 @@
 {% block content %}
 <h1> Mon Panier  </h1>
 
-{% if panier.panierproduit_set.all%}
-<table>
-    <tr>
-        <th>Produit</th>
-        <th>Taille</th>
-        <th>Couleur</th>
-        <th>prix unitaire </th>
-        <th>quantité</th>
-        <th>Total</th>
-        <th>Actions</th>
-    </tr>
-    {% for item in panier.panierproduit_set.all %}
-    <tr>
-        <td>{{ item.variante_produit.produit.nom }}</td>
-        <td>{{ item.variante_produit.taille }}</td>
-        <td>{{ item.variante_produit.couleur }}</td>
-        <td>{{ item.variante_produit.prix }} Fr </td>
-        <td>{{ item.quantite }}</td>
-        <td>{{ total }} Fr</td>
+<!-- Conteneur de toute la page, pour limiter la largeur -->
+<div class="w3-content" style="max-width: 500px;">
 
-        
-        <td>
-            <a href="{% url 'modifier_quantite_panier' item.variante_produit.id 'augmenter' %}">+</a>
-            <a href ="{% url 'modifier_quantite_panier' item.variante_produit.id 'diminuer' %}">-</a>
-            <a href="{% url 'supprimer_du_panier' item.variante_produit.id  %}">Supprimer</a>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
-<style>
-    th, td{
-        padding: 5px 30px;
+    <h1>Mon panier</h1>
 
-    }
-</style>
-<a href="{% url 'checkout'%}">Passer commande</a>
-{% else %}
-<p>Votre panier est vide.</p>
-{% endif %}
+    {% if panier.panierproduit_set.all %}
+
+
+
+        {% for item in panier.panierproduit_set.all %}
+
+            <!-- Une carte par produit -->
+            <div class="w3-card w3-white w3-overshadow w3-margin-bottom">
+                <div class="w3-cell-row">
+                    <div class="w3-cell w3-padding" style="width: 150px; height: 200px;">
+                        <img src="{{ item.variante_produit.produit.image_principale.url }}" 
+                                alt="{{ item.variante_produit.produit.nom }}" style="width: 100%; height: 200px;">
+                    </div>
+
+
+                    <div class="w3-cell w3-padding w3-display-container"  style="width: 350px; height: 200px;">
+
+                        <div class="w3-display-topleft">
+                            <h3>{{ item.variante_produit.produit.nom }}</h3>
+                            <p>Couleur: {{ item.variante_produit.couleur }}</p>
+                            <p>Taille: {{ item.variante_produit.taille }}</p>
+                        </div>
+
+
+                        <div class="w3-display-topright">
+                            <form method="post" action="{% url 'supprimer_du_panier' item.variante_produit.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="w3-button w3-red w3-round">Retirer</button>
+                            </form>
+                        </div>
+
+                        <div class="w3-display-bottomright">
+                            <form method="post" action="{% url 'modifier_quantite_panier' item.variante_produit.id 'decrease' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="w3-button w3-blue w3-round">-</button>
+                            </form>
+                            <span>Quantité: {{ item.quantité }}</span>
+                            <form method="post" action="{% url 'modifier_quantite_panier' item.variante_produit.id 'increase' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="w3-button w3-blue w3-round">+</button>
+                            </form>
+                        </div>
+
+                        <div class="w3-display-bottomleft">
+                            {{ total1 }} Fr
+                        </div>
+
+                        
+
+                    </div>
+                </div>
+            </div>
+
+
+
+        {% endfor %}
+
+        <div class="w3-card w3-white w3-overshadow w3-margin-bottom">
+            <h3>Total: {{ total }} Fr</h3>
+
+            <a href="{% url 'checkout' %}" class="w3-button w3-green w3-block w3-round">commander</a>
+    {% else %}
+
+        <p>Votre panier est vide.</p>
+    {% endif %}
+
+   
+</div>
 
 {% endblock %}

@@ -221,7 +221,9 @@ def affichage_panier(request):
     total = 0
     for item in mon_panier1:
         total += item.variante_produit.prix * item.quantite
-    return render(request, 'projet/panier.html', {'panier': mon_panier, 'total': total, 'mon_panier1': mon_panier1})
+
+    total1= item.variante_produit.prix * item.quantite
+    return render(request, 'projet/panier.html', {'panier': mon_panier, 'total': total, 'mon_panier1': mon_panier1, 'total1': total1})
 
 def panier_et_total(user):
     panier, created = Panier.objects.get_or_create(utilisateur=user)
