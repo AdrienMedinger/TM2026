@@ -46,6 +46,9 @@ def base(request):
  
     return render(request, 'projet/base.html')
 
+from .models import Categorie
+
+
 
 def about_us(request):
     return render(request, 'projet/about_us.html')
@@ -75,7 +78,7 @@ def logout_page(request):
     return redirect('login')
 
 
-@login_required
+
 def home(request):
     produits = Produit.objects.all()
     variante_produit=Variante_produit.objects.all()
@@ -203,6 +206,11 @@ def filtre_produit(request, variante_produit_id = None):
     
     print("CATEGORIES=",list(categories))
     return render(request, 'projet/filtre_produit.html', context)
+
+@login_required
+def profil(request):
+    dernieres_commandes = Order.objects.filter(user=request.user).order_by('-date_commande')[:3]
+    return render(request, 'projet/profil.html', {'dernieres_commandes': dernieres_commandes})
 
 @login_required
 def affichage_panier(request):

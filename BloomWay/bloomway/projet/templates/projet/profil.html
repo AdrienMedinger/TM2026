@@ -1,0 +1,53 @@
+{% extends 'projet/base.html' %}
+{% block content %}
+
+<div class="w3-content w3-padding-64" style="max-width:700px;">
+
+    <!-- Carte d'identité -->
+    <div class="w3-card-4 w3-white w3-round-large w3-margin-bottom">
+        <div class="w3-container w3-black w3-center w3-padding-24 w3-round-large">
+            <svg width="70" height="70" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="8" r="4"/>
+                <path d="M4 21c0-4 4-7 8-7s8 3 8 7"/>
+            </svg>
+            <h2 style="font-family:'Playfair Display', serif; margin-bottom:0;">{{ user.username }}</h2>
+        </div>
+
+        <div class="w3-container w3-padding-16">
+            <p><b>Nom d'utilisateur :</b> {{ user.username }}</p>
+            <p><b>E-mail :</b> {{ user.email|default:"Non renseigné" }}</p>
+            <p><b>Membre depuis :</b> {{ user.date_joined|date:"d.m.Y" }}</p>
+        </div>
+    </div>
+
+    <!-- Dernières commandes -->
+    <div class="w3-card-4 w3-white w3-round-large w3-margin-bottom">
+        <div class="w3-container w3-padding-16">
+            <h3>Mes dernières commandes</h3>
+
+            <table class="w3-table w3-striped w3-bordered">
+                <tr>
+                    <th>N°</th>
+                    <th>Date</th>
+                    <th>Montant</th>
+                </tr>
+                {% for order in dernieres_commandes %}
+                    <tr>
+                        <td><a href="{% url 'ma_commande' order.id %}">{{ order.id }}</a></td>
+                        <td>{{ order.date_commande|date:"d.m.Y" }}</td>
+                        <td>{{ order.montant_payé }} CHF</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="3" class="w3-text-grey">Aucune commande pour le moment.</td></tr>
+                {% endfor %}
+            </table>
+
+            <p><a href="{% url 'mes_commandes' %}" class="w3-button w3-light-grey w3-round">Voir toutes mes commandes</a></p>
+        </div>
+    </div>
+
+    <a href="{% url 'logout' %}" class="w3-button w3-red w3-block w3-round">Déconnexion</a>
+
+</div>
+
+{% endblock %}

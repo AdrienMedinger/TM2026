@@ -1,57 +1,284 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="fr">
-
-<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>BloomWay</title>
     <link rel="stylesheet" href="{% static 'css/w3.css' %}">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&display=swap">
+
+
+    <style>
+        .recherche {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 260px;
+            border-bottom: 1px solid white;
+            padding: 4px 0;
+            transition: width 0.4s;
+        }
+        .recherche:focus-within {
+            width: 340px;
+        }
+        .recherche button {
+            border: none;
+            background: none;
+            padding: 0;
+            cursor: pointer;
+            display: flex;
+        }
+        .recherche input {
+            flex: 1;
+            border: none;
+            outline: none;
+            background: transparent;
+            color: white;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+        .recherche input::placeholder {
+            color: rgba(255, 255, 255, 0.85);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 12px;
+        }
+
+
+        .reassurance {
+            border-top: 1px solid #e2cdb0;
+            margin-top: 64px;
+            padding: 40px 0;
+            background-color: #faf6f0;
+        }
+        .reassurance .colonne {
+            text-align: center;
+            padding: 16px 24px;
+        }
+        .reassurance h4 {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 12px 0 6px;
+            color: #333;
+        }
+        .reassurance p {
+            font-size: 13px;
+            color: #777;
+            margin: 0;
+        }
+
+        .signature {
+            background-color: white;
+            text-align: center;
+            padding: 28px 0 20px;
+            border-top: 1px solid #e2cdb0;
+        }
+        .signature img {
+            width: 56px;
+            height: 56px;
+        }
+        .signature p {
+            color: #8B1E2D;
+            font-family: 'Playfair Display', serif;
+            font-size: 13px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin: 8px 0 0;
+        }
+
+    </style>
+
+    
 </head>
 <body>
-    
-    <h1>BloomWay</h1>
 
-    {% include 'projet/navbar.html' %}
-    <div class="w3-bar w3-light-grey">
+    <!-- ========== MENU LATÉRAL (slide) ========== -->
+    <div id="menuLateral" class="w3-sidebar w3-bar-block w3-white w3-card w3-animate-left"
+         style="display:none; width:300px; z-index:3;">
 
-    <!-- Filtre des produits -->
-    
-            <a href="{% url 'filtre_produit'%}" class="w3-bar-item w3-button w3-large">&#9776;</a>
+        <button onclick="fermerMenu()" class="w3-bar-item w3-button w3-large w3-right-align">&times; Fermer</button>
+
+        <!-- Liens de navigation -->
+        <h5 class="w3-padding">Menu</h5>
+        <a href="{% url 'home' %}" class="w3-bar-item w3-button">Accueil</a>
+        <a href="{% url 'about_us' %}" class="w3-bar-item w3-button">À propos</a>
+        <a href="{% url 'affichage_produit' %}" class="w3-bar-item w3-button">Produits</a>
+
+        {% if user.is_authenticated %}
+            <a href="{% url 'mes_commandes' %}" class="w3-bar-item w3-button">Mes commandes</a>
+            <a href="{% url 'logout' %}" class="w3-bar-item w3-button">Déconnexion</a>
+        {% else %}
+            <a href="{% url 'login' %}" class="w3-bar-item w3-button">Connexion</a>
+        {% endif %}
+
+        {% if request.user.is_superuser %}
+            <h5 class="w3-padding">Admin</h5>
+            <a href="{% url 'envoye_dashboard' %}" class="w3-bar-item w3-button">Envoyé</a>
+            <a href="{% url 'pas_envoye_dashboard' %}" class="w3-bar-item w3-button">Pas envoyé</a>
+        {% endif %}
+
+        <hr>
+
+        <!-- Filtre des produits -->
+        <h5 class="w3-padding">Filtrer les produits</h5>
+        <form method="get" action="{% url 'filtre_produit' %}" class="w3-container w3-padding-16">
+
+            <label>Catégorie</label>
+            <select class="w3-select w3-margin-bottom" name="categorie" required>
+                <option value="">Choisir une catégorie</option>
+                {% for cat in categories_menu %}
+                    <option value="{{ cat.categorie }}"
+                        {% if request.GET.categorie == cat.categorie %}selected{% endif %}>
+                        {{ cat.categorie }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <label>Taille</label>
+            <select class="w3-select w3-margin-bottom" name="taille">
+                <option value="">Toutes</option>
+                <option value="S" {% if request.GET.taille == 'S' %}selected{% endif %}>S</option>
+                <option value="M" {% if request.GET.taille == 'M' %}selected{% endif %}>M</option>
+                <option value="L" {% if request.GET.taille == 'L' %}selected{% endif %}>L</option>
+            </select>
+
+            <label>Couleur</label>
+            <input class="w3-input w3-margin-bottom" type="text" name="couleur" value="{{ request.GET.couleur }}">
+
+            <label>Prix min</label>
+            <input class="w3-input w3-margin-bottom" type="number" step="0.01" name="prix_min" value="{{ request.GET.prix_min }}">
+
+            <label>Prix max</label>
+            <input class="w3-input w3-margin-bottom" type="number" step="0.01" name="prix_max" value="{{ request.GET.prix_max }}">
+
+            <button type="submit" class="w3-button w3-black w3-block w3-round">Filtrer</button>
+        </form>
+    </div>
+
+    <!-- Fond sombre derrière le menu (un clic dessus ferme le menu) -->
+    <div id="voileMenu" class="w3-overlay" onclick="fermerMenu()" style="cursor:pointer;"></div>
 
 
+    <!-- ========== EN-TÊTE ========== -->
+    <header class="w3-container w3-center w3-padding-32" style="background-color:#e2cdb0;">
+        <h1 style="color:white; margin:0; font-family:'Playfair Display', serif; font-size:48px; letter-spacing:4px; text-shadow:0 2px 6px rgba(0,0,0,0.25);">
+            BloomWay
+        </h1>
+    </header>
+
+    <!-- ========== BARRE DE NAVIGATION ========== -->
+   <div class="w3-bar w3-card" style="background-color:#e2cdb0; margin-bottom:32px;">
+        <!-- Burger : ouvre le menu -->
+        <button onclick="ouvrirMenu()" class="w3-bar-item w3-button w3-large" style="color:white;">&#9776;</button>
+
+        <!-- Recherche -->
+               
+        <form class="w3-bar-item" method="get" action="{% url 'affichage_produit' %}">
+            <div class="recherche">
+                <button type="submit" title="Rechercher">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="7"/>
+                        <path d="M20 20l-3.5-3.5"/>
+                    </svg>
+                </button>
+                <input type="text" name="q" placeholder="Rechercher" value="{{ query|default:'' }}">
+            </div>
+        </form>
+
+        <!-- Panier -->
+        <a href="{% url 'affichage_panier' %}" class="w3-bar-item w3-button w3-right">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 8h12l1 13H5L6 8Z"/>
+                <path d="M9 9V6a3 3 0 0 1 6 0v3"/>
+            </svg>
+        </a>
+
+        <!-- Profil -->
+        {% if user.is_authenticated %}
+            <a href="{% url 'profil' %}" class="w3-bar-item w3-button w3-right" title="Mon profil">
+        {% else %}
+            <a href="{% url 'login' %}" class="w3-bar-item w3-button w3-right" title="Se connecter">
+        {% endif %}
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="8" r="4"/>
+                <path d="M4 21c0-4 4-7 8-7s8 3 8 7"/>
+            </svg>
+        </a>
+
+    </div>
+
+    <!-- ========== CONTENU DES PAGES ========== -->
+    {% block content %}
+    {% endblock %}
 
 
-    <!-- Formulaire de recherche -->
-        
-            <form class="w3-bar-item" method="get" action="{% url 'affichage_produit' %}"> 
-                <input class="w3-border w3-round" type ="text" name="q" placeholder="Rechercher un produit" value="{{ query|default:''    }}">
-                <button class="w3-button w3-white w3-border w3-round" type="submit">&#128269;</button>
-                    
-            </form>
+    <!-- ========== RÉASSURANCE (footer) ========== -->
+    <footer class="reassurance">
+        <div class="w3-row-padding">
 
-    
-    <!-- Lien vers le panier -->
-        <div>
-            <a href="{% url 'affichage_panier' %}" class="w3-bar-items w3-button w3-right">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="gray" sttroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M6 8h12l1 13H5L6 8Z"/>
-                    <path d="M9 9V6a3 3 0 0 1 6 0v3"/>
+            <div class="w3-quarter colonne">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#C8B08E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="5" y="11" width="14" height="10" rx="2"/>
+                    <path d="M8 11V7a4 4 0 0 1 8 0v4"/>
                 </svg>
-            </a>
+                <h4>Paiement sécurisé</h4>
+                <p>Vos données sont protégées à chaque commande.</p>
+            </div>
+
+            <div class="w3-quarter colonne">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#C8B08E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 7h11v10H3z"/>
+                    <path d="M14 10h4l3 3v4h-7"/>
+                    <circle cx="7" cy="18" r="1.5"/>
+                    <circle cx="17" cy="18" r="1.5"/>
+                </svg>
+                <h4>Livraison</h4>
+                <p>Expédition rapide partout en Suisse.</p>
+            </div>
+
+            <div class="w3-quarter colonne">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#C8B08E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 12a9 9 0 1 0 3-6.7"/>
+                    <path d="M3 4v5h5"/>
+                </svg>
+                <h4>Retours faciles</h4>
+                <p>Vous changez d'avis ? Retour possible sous 30 jours.</p>
+            </div>
+
+            <div class="w3-quarter colonne">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#C8B08E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 6h16v12H4z"/>
+                    <path d="M4 7l8 6 8-6"/>
+                </svg>
+                <h4>Service client</h4>
+                <p>Une question ? Écrivez-nous à boutique@bloomway.ch</p>
+            </div>
+
         </div>
+    </footer>
+
+    <!-- ========== SIGNATURE (logo) ========== -->
+    <div class="signature">
+        <img src="{% static 'images/logo.svg' %}" alt="Logo BloomWay">
+        <p>BloomWay</p>
     </div>
 
 
-    {% block content %}
-    {% endblock %}
-        {% if user.is_authenticated %}
-            <p>Bienvenue, {{ user.username }}! <a href="{% url 'logout' %}">Logout</a></p>
-        {% else %}
-            <p><a href="{% url 'login' %}">Login</a></p>
-        {% endif %}
- </body>
+    <!-- ========== SCRIPT DU MENU ========== -->
+    <script>
+        function ouvrirMenu() {
+            document.getElementById("menuLateral").style.display = "block";
+            document.getElementById("voileMenu").style.display = "block";
+        }
+        function fermerMenu() {
+            document.getElementById("menuLateral").style.display = "none";
+            document.getElementById("voileMenu").style.display = "none";
+
+            
+        }
+    </script>   
+
+</body>
 </html>

@@ -1,60 +1,188 @@
-{%extends 'projet/base.html' %}
+{% extends 'projet/base.html' %}
 
 {% block content %}
-        <!-- Détails du produit -->
-        <div class ="produit">
-            <h3>{{ produit.nom }}</h3>
-            <p>{{ produit.description }}</p>
-            <img src="{{produit.image_principale.url}}"
-                 alt="{{ produit.nom }}"
-                 width="300" height="300">
 
-            <!-- choix de la taille qui permet de selectionné une variante -->
-            <div style="clear: both;">
-                {% for v in produit.variantes.all %}
-                    <form methof="get" style="display:inline;">
-                        <button type="submit"
-                                name="variante"
-                                value="{{ v.id }}">
-                            {{ v.taille }}
-                        </button>
-                    </form>
-                    
-                {% endfor %}
-            </div>
-            <!-- Stock -->
-             {% if variante %}
-                {% if variante.stock == 0 %}
-                    <span style="color: red;">Rupture de stock</span>
-                {% else %}
-                    <span style="color: green;">En stock</span>
-                     <p> {{ variante.stock }} unités disponibles en {{ variante.taille }}</p>
-                {% endif %}
-            {% endif %}
+<style>
+    .fiche-produit {
+        display: flex;
+        align-items: flex-start;   /* indispensable pour que le panneau puisse rester fixe */
+        gap: 48px;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 24px;
+    }
 
-            <!--Prix -->
-                {% if variante %}
-                    <p> Prix: {{ variante.prix }} CHF</p>
-                   
-                {% else %}
-                    <p> Prix: Non disponible</p>
-                    
-                {% endif %}
+    /* ----- Colonne de gauche : les photos ----- */
+    .photos {
+        flex: 3;
+    }
+    .photos img {
+        width: 100%;
+        display: block;
+        margin-bottom: 12px;
+        background-color: #faf6f0;
+    }
 
-            <!-- bouton "Ajouter au panier" -->
-            {% if taille_selectionnee %}
-              <form method="post" action="{% url 'ajouter_au_panier' variante.id  %}">
-                     {% csrf_token %}
-                     <button type="submit">Ajouter au panier</button>
-                    </form>
-            {% else %}
-                <p>Veuillez sélectionner une variante pour ajouter au panier.</p>
-                <button type="button" disablesd>Ajouter au panier</button>
-            {% endif %}
+    /* ----- Colonne de droite : le panneau fixe ----- */
+    .panneau {
+        flex: 2;
+        position: sticky;
+        top: 24px;                 /* distance avec le haut de l'écran quand il est « collé » */
+        padding: 32px;
+        background-color: white;
+        border: 1px solid #eee;
+    }
+    .panneau h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: 30px;
+        margin: 0 0 8px;
+    }
+    .panneau .prix {
+        font-size: 20px;
+        margin: 0 0 24px;
+    }
+    .panneau .description {
+        color: #555;
+        line-height: 1.7;
+        margin-bottom: 24px;
+    }
+    .panneau .titre-section {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: #777;
+        margin: 0 0 10px;
+    }
 
-            
+    /* Boutons de taille */
+    .tailles {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 20px;
+    }
+    .tailles form {
+        margin: 0;
+    }
+    .tailles button {
+        min-width: 48px;
+        padding: 10px 14px;
+        border: 1px solid #ccc;
+        background-color: white;
+        cursor: pointer;
+        transition: border-color 0.2s;
+    }
+    .tailles button:hover {
+        border-color: #333;
+    }
+    .tailles button.active {
+        border-color: #333;
+        background-color: #333;
+        color: white;
+    }
+
+    /* Stock */
+    .stock {
+        font-size: 14px;
+        margin-bottom: 24px;
+    }
+
+    /* Bouton panier */
+    .btn-panier {
+        width: 100%;
+        padding: 16px;
+        border: none;
+        background-color: #8B1E2D;
+        color: white;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    .btn-panier:hover {
+        background-color: #6e1723;
+    }
+    .btn-panier:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+
+   
+</style>
+
+
+<div class="fiche-produit">
+
+    <!-- ========== COLONNE DE GAUCHE : PHOTOS ========== -->
+    <div class="photos">
+        {% if produit.image_principale %}
+            <img src="{{ produit.image_principale.url }}" alt="{{ produit.nom }}">
+        {% endif %}
+        {% if produit.image_secondaire %}
+            <img src="{{ produit.image_secondaire.url }}" alt="{{ produit.nom }}">
+        {% endif %}
+        {% if produit.troisième_image %}
+            <img src="{{ produit.troisième_image.url }}" alt="{{ produit.nom }}">
+        {% endif %}
+    </div>
+
+
+    <!-- ========== COLONNE DE DROITE : PANNEAU FIXE ========== -->
+    <div class="panneau">
+
+        <h1>{{ produit.nom }}</h1>
+
+        <!-- Prix -->
+        {% if variante %}
+            <p class="prix">{{ variante.prix }} CHF</p>
+        {% else %}
+            <p class="prix">Prix non disponible</p>
+        {% endif %}
+
+        <!-- Description -->
+        <p class="description">{{ produit.description }}</p>
+
+        <!-- Choix de la taille -->
+        <p class="titre-section">Taille</p>
+        <div class="tailles">
+            {% for v in produit.variantes.all %}
+                <form method="get">
+                    <button type="submit" name="variante" value="{{ v.id }}"
+                        {% if taille_selectionnee == v.id|stringformat:"s" %}class="active"{% endif %}>
+                        {{ v.taille }}
+                    </button>
+                </form>
+            {% endfor %}
         </div>
 
+        <!-- Stock -->
+        {% if variante and taille_selectionnee %}
+            <div class="stock">
+                {% if variante.stock == 0 %}
+                    <span class="w3-text-red">Rupture de stock</span>
+                {% else %}
+                    <span class="w3-text-green">En stock</span>
+                    · {{ variante.stock }} unités disponibles en {{ variante.taille }}
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <!-- Bouton "Ajouter au panier" -->
+        {% if taille_selectionnee and variante.stock > 0 %}
+            <form method="post" action="{% url 'ajouter_au_panier' variante.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn-panier">Ajouter au panier</button>
+            </form>
+        {% else %}
+            <button type="button" class="btn-panier" disabled>Ajouter au panier</button>
+            {% if not taille_selectionnee %}
+                <p class="w3-small w3-text-grey">Veuillez sélectionner une taille.</p>
+            {% endif %}
+        {% endif %}
+
+    </div>
+
+</div>
 
 {% endblock %}
-

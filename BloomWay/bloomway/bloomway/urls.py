@@ -71,4 +71,6 @@ urlpatterns = [
 
     path('ma_commande/<int:pk>/', projet.views.ma_commande, name='ma_commande'),
 
+    path('profil/', projet.views.profil, name='profil'),
+
  ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
