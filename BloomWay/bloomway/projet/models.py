@@ -68,6 +68,11 @@ class PanierProduit(models.Model):
     panier = models.ForeignKey(Panier, on_delete=models.CASCADE)
     variante_produit = models.ForeignKey(Variante_produit, on_delete=models.CASCADE)
     quantite = models.PositiveIntegerField(default=1)
+
+
+    def sous_total(self):
+        return self.variante_produit.prix * self.quantite
+    
     class Meta:
         unique_together = ('panier', 'variante_produit')
 

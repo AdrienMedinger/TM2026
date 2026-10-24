@@ -1,80 +1,106 @@
-{% extends 'projet/base.html' %} 
+{% extends 'projet/base.html' %}
 
 {% block content %}
-<h1> Mon Panier  </h1>
 
-<!-- Conteneur de toute la page, pour limiter la largeur -->
-<div class="w3-content" style="max-width: 500px;">
+<div class="w3-content w3-padding" style="max-width:800px;">
 
-    <h1>Mon panier</h1>
+    <h1 class="w3-center" style="font-family:'Playfair Display', serif; margin-bottom:32px;">Mon panier</h1>
 
-    {% if panier.panierproduit_set.all %}
+    {% if mon_panier1 %}
 
+        {% for item in mon_panier1 %}
 
+            <!-- ===== Carte d'un produit ===== -->
+            <div class="w3-card w3-white w3-margin-bottom">
+                <div class="w3-cell-row" style="display: flex;">
 
-        {% for item in panier.panierproduit_set.all %}
-
-            <!-- Une carte par produit -->
-            <div class="w3-card w3-white w3-overshadow w3-margin-bottom">
-                <div class="w3-cell-row">
-                    <div class="w3-cell w3-padding" style="width: 150px; height: 200px;">
-                        <img src="{{ item.variante_produit.produit.image_principale.url }}" 
-                                alt="{{ item.variante_produit.produit.nom }}" style="width: 100%; height: 200px;">
+                    <!-- Image à gauche -->
+                    <div class="w3-cell" style="width:160px;">
+                        <a href="{% url 'detail' item.variante_produit.produit.id %}">
+                            <img src="{{ item.variante_produit.produit.image_principale.url }}"
+                                 alt="{{ item.variante_produit.produit.nom }}"
+                                 style="width:100%; height:200px; object-fit:cover; display:block;">
+                        </a>
                     </div>
 
+                    <!-- Infos à droite -->
+                    <div class="w3-cell w3-display-container" style="flex:1; height:200px;">
 
-                    <div class="w3-cell w3-padding w3-display-container"  style="width: 350px; height: 200px;">
-
-                        <div class="w3-display-topleft">
-                            <h3>{{ item.variante_produit.produit.nom }}</h3>
-                            <p>Couleur: {{ item.variante_produit.couleur }}</p>
-                            <p>Taille: {{ item.variante_produit.taille }}</p>
+                        <!-- En haut à gauche : nom, taille, couleur -->
+                        <div class="w3-display-topleft w3-padding" style="right:90px;">
+                            <h4 style="font-family:'Playfair Display', serif; margin:0 0 4px;">
+                                {{ item.variante_produit.produit.nom }}
+                            </h4>
+                            <p class="w3-small w3-text-grey" style="margin:0;">
+                                Taille : {{ item.variante_produit.taille }} · Couleur : {{ item.variante_produit.couleur }}
+                            </p>
+                            <p class="w3-small w3-text-grey" style="margin:0;">
+                                Prix unitaire : {{ item.variante_produit.prix }} CHF
+                            </p>
                         </div>
 
-
-                        <div class="w3-display-topright">
+                        <!-- En haut à droite : Retirer -->
+                        <div class="w3-display-topright w3-padding">
                             <form method="post" action="{% url 'supprimer_du_panier' item.variante_produit.id %}">
                                 {% csrf_token %}
-                                <button type="submit" class="w3-button w3-red w3-round">Retirer</button>
+                                <button type="submit" class="w3-small w3-text-grey w3-hover-text-black"
+                                        style="background:none; border:none; padding:0; text-decoration:underline; cursor:pointer;">
+                                    Retirer
+                                </button>
                             </form>
                         </div>
 
-                        <div class="w3-display-bottomright">
-                            <form method="post" action="{% url 'modifier_quantite_panier' item.variante_produit.id 'decrease' %}">
+                        <!-- En bas à gauche : quantité -->
+                        <div class="w3-display-bottomleft w3-padding">
+                            <form method="post" action="{% url 'modifier_quantite_panier' item.variante_produit.id 'diminuer' %}" style="display:inline;">
                                 {% csrf_token %}
-                                <button type="submit" class="w3-button w3-blue w3-round">-</button>
+                                <button type="submit" class="w3-button w3-border w3-small w3-white">&minus;</button>
                             </form>
-                            <span>Quantité: {{ item.quantité }}</span>
-                            <form method="post" action="{% url 'modifier_quantite_panier' item.variante_produit.id 'increase' %}">
+
+                            <span class="w3-padding">{{ item.quantite }}</span>
+
+                            <form method="post" action="{% url 'modifier_quantite_panier' item.variante_produit.id 'augmenter' %}" style="display:inline;">
                                 {% csrf_token %}
-                                <button type="submit" class="w3-button w3-blue w3-round">+</button>
+                                <button type="submit" class="w3-button w3-border w3-small w3-white">+</button>
                             </form>
                         </div>
 
-                        <div class="w3-display-bottomleft">
-                            {{ total1 }} Fr
+                        <!-- En bas à droite : sous-total -->
+                        <div class="w3-display-bottomright w3-padding">
+                            <span class="w3-large">{{ item.sous_total }} CHF</span>
                         </div>
-
-                        
 
                     </div>
                 </div>
             </div>
 
-
-
         {% endfor %}
 
-        <div class="w3-card w3-white w3-overshadow w3-margin-bottom">
-            <h3>Total: {{ total }} Fr</h3>
+        <!-- ===== Récapitulatif ===== -->
+        <div class="w3-card w3-white w3-padding-16 w3-margin-top">
+            <div class="w3-container">
+                <p class="w3-text-grey w3-small" style="text-transform:uppercase; letter-spacing:2px; margin:0;">Récapitulatif</p>
+                <hr style="margin:12px 0;">
+                <p class="w3-large" style="margin:0 0 16px;">
+                    Total
+                    <span class="w3-right"><b>{{ total }} CHF</b></span>
+                </p>
+                <a href="{% url 'checkout' %}" class="w3-button w3-block"
+                   style="background-color:#8B1E2D; color:white; letter-spacing:2px; text-transform:uppercase;">
+                    Passer commande
+                </a>
+            </div>
+        </div>
 
-            <a href="{% url 'checkout' %}" class="w3-button w3-green w3-block w3-round">commander</a>
     {% else %}
 
-        <p>Votre panier est vide.</p>
+        <div class="w3-center w3-padding-64">
+            <p class="w3-large">Votre panier est vide.</p>
+            <a href="{% url 'affichage_produit' %}" class="w3-button w3-border">Découvrir nos produits</a>
+        </div>
+
     {% endif %}
 
-   
 </div>
 
 {% endblock %}

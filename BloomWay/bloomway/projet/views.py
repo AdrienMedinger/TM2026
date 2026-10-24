@@ -216,19 +216,19 @@ def profil(request):
 def affichage_panier(request):
     mon_panier, created = Panier.objects.get_or_create(utilisateur=request.user)
 
-    mon_panier1 = PanierProduit.objects.filter(panier=mon_panier)
+    mon_panier1 = PanierProduit.objects.filter(panier=mon_panier).select_related('variante_produit__produit')
 
     total = 0
     for item in mon_panier1:
-        total += item.variante_produit.prix * item.quantite
+        total += item.sous_total()
 
-    total1= item.variante_produit.prix * item.quantite
-    return render(request, 'projet/panier.html', {'panier': mon_panier, 'total': total, 'mon_panier1': mon_panier1, 'total1': total1})
+    return render(request, 'projet/panier.html', {'panier': mon_panier, 'total': total, 'mon_panier1': mon_panier1})
+
 
 def panier_et_total(user):
     panier, created = Panier.objects.get_or_create(utilisateur=user)
     items = PanierProduit.objects.filter(panier=panier).select_related('variante_produit')
-    total = sum(item.variante_produit.prix * item.quantite for item in items)
+    total = sum(item.sous_total() for item in items)
     return panier, items, total
 
 @login_required
@@ -458,9 +458,8 @@ def envoye_dashboard(request):
 def commande(request, pk):
     order = get_object_or_404(Order, id=pk)
     items = order.items.select_related('produit', 'variante_produit')
-    total = panier_et_total(request.user)
+    total = sum(item.price * item.quantité for item in items)
     return render(request, 'projet/commande.html', {'order': order, 'order_items': items, 'total': total})
-    
 
 
 
