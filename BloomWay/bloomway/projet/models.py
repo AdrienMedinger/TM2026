@@ -131,5 +131,9 @@ class OrderItem(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     quantité = models.PositiveIntegerField(default=1)
 
+
+    def sous_total(self):
+        return self.price * self.quantité
+
     def __str__(self):
         return f"OrderItem - {str(self.id)}"

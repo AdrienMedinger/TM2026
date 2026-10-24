@@ -1,85 +1,123 @@
 {% extends 'projet/base.html' %}
 
-
 {% block content %}
-<h1> info de facturation</h1>
 
-<div class="card">
-  <div class="card-header">
-    <strong>Recapitulatif de la commande</strong>
-  </div>
-  <br></br>
-  <div class="card-body">
-    {% for panier_produit in panier_produits %}
-        <strong>Produit: {{ panier_produit.variante_produit.produit.nom }}</strong>
+<!-- Seul CSS personnalisé : l'apparence des champs générés par Django -->
+<style>
+    .formulaire input, .formulaire select, .formulaire textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+    }
+</style>
 
-        <small> 
-            ({{ panier_produit.variante_produit.taille }} - {{ panier_produit.variante_produit.couleur }})
-            Quantité: {{ panier_produit.quantite }}
-            -  {{ panier_produit.variante_produit.prix }} Fr / pièce 
-        </small>
+<div class="w3-content w3-padding" style="max-width:1000px;">
 
-        <br></br>
+    <!-- ===== Titre et étapes ===== -->
+    <h1 class="w3-center" style="font-family:'Playfair Display', serif;">Finaliser ma commande</h1>
 
-    {% endfor %}
+    <p class="w3-center w3-small w3-wide w3-text-grey w3-margin-bottom">
+        PANIER &nbsp;›&nbsp; LIVRAISON &nbsp;›&nbsp;
+        <b style="color:#8B1E2D;">PAIEMENT</b>
+    </p>
 
-    <strong>Total: {{total}} Fr</strong>
-        <br></br>
+    <div class="w3-row-padding w3-padding-24">
 
-  </div>
-</div>
+        <!-- ========== COLONNE GAUCHE : LIVRAISON + PAIEMENT ========== -->
+        <div class="w3-col l7 m12">
 
+            <!-- ----- Adresse de livraison (rappel) ----- -->
+            <div class="w3-white w3-border w3-padding-large w3-margin-bottom">
 
+                <p class="w3-small w3-wide w3-text-grey">
+                    ADRESSE DE LIVRAISON
+                    <a href="{% url 'checkout' %}" class="w3-right w3-text-grey w3-hover-text-black" style="letter-spacing:0;">Modifier</a>
+                </p>
 
-<div class="card">
-   
-    <div class="card-header">
-     <strong>info de livraison</strong>
-    </div>
-    <div class="card-body">
-        
-    Nom entier: <small>{{ shipping_info.nom_entier }}</small>
+                <p style="margin:0; line-height:1.8;">
+                    <b>{{ shipping_info.nom_entier }}</b><br>
+                    {{ shipping_info.adresse }}<br>
+                    {{ shipping_info.code_postal }} {{ shipping_info.ville }}<br>
+                    {{ shipping_info.pays }}<br>
+                    <span class="w3-text-grey">{{ shipping_info.email }}</span>
+                </p>
 
-    <br></br>
+            </div>
 
-    Email: <small>{{ shipping_info.email }}</small>
+            <!-- ----- Paiement ----- -->
+            <div class="w3-white w3-border w3-padding-large w3-margin-bottom">
 
-    <br></br>
+                <p class="w3-small w3-wide w3-text-grey">PAIEMENT</p>
 
-    Adresse: <small>{{ shipping_info.adresse }}</small>
+                <div class="w3-panel w3-pale-yellow w3-leftbar w3-border-amber w3-small">
+                    <p>Démonstration (travail de maturité) : aucun paiement réel n'est effectué.</p>
+                </div>
 
-    <br></br>
+                <form method="post" action="{% url 'process_order' %}" class="formulaire">
+                    {% csrf_token %}
 
-    Ville: <small>{{ shipping_info.ville }}</small>
+                    {% for field in paiement_form %}
+                        <div class="w3-margin-bottom">
+                            <label for="{{ field.id_for_label }}" class="w3-small w3-text-dark-grey">{{ field.label }}</label>
+                            {{ field }}
+                            {% for error in field.errors %}
+                                <span class="w3-small w3-text-red">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
 
-     <br></br>
+                    <button type="submit" class="w3-button w3-block w3-padding-16 w3-wide w3-margin-top"
+                            style="background-color:#8B1E2D; color:white; white-space:normal;">
+                        CONFIRMER LA COMMANDE · {{ total }} CHF
+                    </button>
+                </form>
 
-    Code Postal: <small>{{ shipping_info.code_postal }}</small>
+            </div>
+        </div>
 
-     <br></br>
+        <!-- ========== COLONNE DROITE : RÉCAPITULATIF ========== -->
+        <div class="w3-col l5 m12" style="position:sticky; top:24px;">
+            <div class="w3-sand w3-border w3-padding-large">
 
-    Pays: <small>{{ shipping_info.pays }}</small>
+                <p class="w3-small w3-wide w3-text-grey">VOTRE COMMANDE</p>
 
-     <br></br>
+                {% for panier_produit in panier_produits %}
+                    <div class="w3-cell-row w3-border-bottom w3-padding-16">
 
-    <a href="{% url 'checkout' %}" class="btn btn-outline-secondary"> update infos </a>
+                        <!-- Miniature -->
+                        <div class="w3-cell w3-cell-middle" style="width:70px;">
+                            {% if panier_produit.variante_produit.produit.image_principale %}
+                                <img src="{{ panier_produit.variante_produit.produit.image_principale.url }}"
+                                     alt="{{ panier_produit.variante_produit.produit.nom }}"
+                                     style="width:56px; height:70px; object-fit:cover; display:block;">
+                            {% endif %}
+                        </div>
 
-    <br></br>
+                        <!-- Nom, taille, couleur, quantité -->
+                        <div class="w3-cell w3-cell-middle">
+                            <span style="font-family:'Playfair Display', serif;">{{ panier_produit.variante_produit.produit.nom }}</span><br>
+                            <span class="w3-small w3-text-grey">
+                                {{ panier_produit.variante_produit.taille }} · {{ panier_produit.variante_produit.couleur }} · Qté {{ panier_produit.quantite }}
+                            </span>
+                        </div>
 
-    </div>
-</div>
-<div class="card">
-   
-    <div class="card-header">
-     <strong>info de paiement</strong>
-    </div>
-    <div class="card-body">
-        <p> Démonstration (travail de maturité) : aucun paiement réel n'est effectué </p>
-        <form method="POST" action="{% url 'process_order' %}">
-            {% csrf_token %}
-            {{ paiement_form.as_p }}
-            <button type="submit">confirmer la commande ({{ total }} Fr)</button>
-        </form>
+                        <!-- Sous-total -->
+                        <div class="w3-cell w3-cell-middle w3-right-align" style="width:100px;">
+                            {{ panier_produit.sous_total }} CHF
+                        </div>
+
+                    </div>
+                {% endfor %}
+
+                <p class="w3-large w3-margin-top">
+                    Total
+                    <b class="w3-right">{{ total }} CHF</b>
+                </p>
+
+                <a href="{% url 'affichage_panier' %}" class="w3-small w3-text-grey w3-hover-text-black">‹ Modifier le panier</a>
+
+            </div>
+        </div>
 
     </div>
 </div>

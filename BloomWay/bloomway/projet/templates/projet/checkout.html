@@ -1,58 +1,108 @@
 {% extends 'projet/base.html' %}
 
 {% block content %}
-<h1> Checkout </h1>
-<div class ="container">
-    <div class ="row">
-        <div class="col-md-6">
-    </div>
-</div>
-
-<div class="card">
-    <div class="card-header">
-    Formulaire de paiement
-    </div>
-<br></br>
-        <div class="card-body">
-            {% for panier_produit in panier_produits %}
-                <strong>Produit: {{ panier_produit.variante_produit.produit.nom }}</strong>
-
-                <small> Quantité: {{ panier_produit.quantite }}</small>
 
 
-                <br></br>
+<style>
+    .formulaire input, .formulaire select, .formulaire textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+    }
+</style>
 
-            {% endfor %}
+<div class="w3-content w3-padding" style="max-width:1000px;">
 
-            Total: {{total}}
-                <br></br>
+    <!-- ===== Titre et étapes ===== -->
+    <h1 class="w3-center" style="font-family:'Playfair Display', serif;">Finaliser ma commande</h1>
 
-            <form method="GET" action="{% url 'affichage_panier' %}">
-                <button type="submit">Modifier Panier</button>
-            </form>
+    <p class="w3-center w3-small w3-wide w3-text-grey w3-margin-bottom">
+        PANIER &nbsp;›&nbsp;
+        <b style="color:#8B1E2D;">LIVRAISON</b>
+        &nbsp;›&nbsp; PAIEMENT
+    </p>
 
-            
-                
+    <div class="w3-row-padding w3-padding-24">
+
+        <!-- ========== COLONNE GAUCHE : LIVRAISON ========== -->
+        <div class="w3-col l7 m12 w3-margin-bottom">
+            <div class="w3-white w3-border w3-padding-large">
+
+                <p class="w3-small w3-wide w3-text-grey">ADRESSE DE LIVRAISON</p>
+
+                {% if shipping_form.non_field_errors %}
+                    <div class="w3-panel w3-pale-red w3-border w3-border-red">
+                        {% for error in shipping_form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+                    </div>
+                {% endif %}
+
+                <form method="post" action="{% url 'facturation_info' %}" class="formulaire">
+                    {% csrf_token %}
+
+                    {% for field in shipping_form %}
+                        <div class="w3-margin-bottom">
+                            <label for="{{ field.id_for_label }}" class="w3-small w3-text-dark-grey">{{ field.label }}</label>
+                            {{ field }}
+                            {% for error in field.errors %}
+                                <span class="w3-small w3-text-red">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+
+                    <button type="submit" class="w3-button w3-block w3-padding-16 w3-wide w3-margin-top"
+                            style="background-color:#8B1E2D; color:white; white-space:normal;">
+                        CONTINUER VERS LE PAIEMENT
+                    </button>
+                </form>
+
+            </div>
         </div>
-</div>
-<div class="card">
-   
-    <div class="card-header">
-     info de livraison
+
+        <!-- ========== COLONNE DROITE : RÉCAPITULATIF ========== -->
+        <div class="w3-col l5 m12" style="position:sticky; top:24px;">
+            <div class="w3-sand w3-border w3-padding-large">
+
+                <p class="w3-small w3-wide w3-text-grey">VOTRE COMMANDE</p>
+
+                {% for panier_produit in panier_produits %}
+                    <div class="w3-cell-row w3-border-bottom w3-padding-16">
+
+                        <!-- Miniature -->
+                        <div class="w3-cell w3-cell-middle" style="width:70px;">
+                            {% if panier_produit.variante_produit.produit.image_principale %}
+                                <img src="{{ panier_produit.variante_produit.produit.image_principale.url }}"
+                                     alt="{{ panier_produit.variante_produit.produit.nom }}"
+                                     style="width:56px; height:70px; object-fit:cover; display:block;">
+                            {% endif %}
+                        </div>
+
+                        <!-- Nom, taille, quantité -->
+                        <div class="w3-cell w3-cell-middle">
+                            <span style="font-family:'Playfair Display', serif;">{{ panier_produit.variante_produit.produit.nom }}</span><br>
+                            <span class="w3-small w3-text-grey">
+                                Taille {{ panier_produit.variante_produit.taille }} · Quantité {{ panier_produit.quantite }}
+                            </span>
+                        </div>
+
+                        <!-- Sous-total -->
+                        <div class="w3-cell w3-cell-middle w3-right-align" style="width:100px;">
+                            {{ panier_produit.sous_total }} CHF
+                        </div>
+
+                    </div>
+                {% endfor %}
+
+                <p class="w3-large w3-margin-top">
+                    Total
+                    <b class="w3-right">{{ total }} CHF</b>
+                </p>
+
+                <a href="{% url 'affichage_panier' %}" class="w3-small w3-text-grey w3-hover-text-black">‹ Modifier le panier</a>
+
+            </div>
+        </div>
+
     </div>
-    <div class="card-body">
-       
-    
-    </div>
 </div>
-<div class="card">
-    <div class="card-header">
-        <form method ="POST" action="{% url 'facturation_info' %}">
-            {% csrf_token %}
-            {{ shipping_form.as_p}}
-            
-            <button type="submit">Continuer l'achat</button>
-        </form>
-    </div>
-</div>
+
 {% endblock %}

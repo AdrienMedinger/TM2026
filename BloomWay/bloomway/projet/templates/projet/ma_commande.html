@@ -1,34 +1,95 @@
 {% extends 'projet/base.html' %}
 
- {% block content %}
- <h1>Commande n°{{ order.id }}</h1> 
- <p> Passée le {{ order.date_commande|date:"d.m.Y" }}</p>
- <br>
- <p> {{ order.adresse|linebreaks }}</p>
+{% block content %}
 
+<div class="w3-content w3-padding" style="max-width:1000px;">
 
- <table>
-    <tr>
-        <th>Produit</th>
-        <th>Couleur</th>
-        <th>Taille</th>
-        <th>Quantité</th>
-        <th>Prix</th>
-       
-       
-    </tr>
-    {% for items in order_items %}
-    <tr>
-        <td>{{ items.produit.nom }}</td>
-        <td>{{ items.variante_produit.couleur }}</td>
-        <td>{{ items.variante_produit.taille }}</td>
-        <td>{{ items.orderitem.quantité }}</td>
-        <td>{{ items.variante_produit.prix }} Fr</td>
-    </tr>
-    {% endfor %}
- </table>
+    <!-- ===== En-tête de la commande ===== -->
+    <div class="w3-center w3-margin-bottom">
+        <p class="w3-small w3-wide w3-text-grey" style="margin-bottom:0;">COMMANDE N° {{ order.id }}</p>
+        <h1 style="font-family:'Playfair Display', serif; margin-top:4px;">Merci pour votre commande</h1>
+        <p class="w3-text-grey">Passée le {{ order.date_commande|date:"d.m.Y" }}</p>
 
- <p><strong>Total: {{ total }} Fr</strong></p>
- <a href="{% url 'mes_commandes' %}" class="btn btn-primary">Retour à mes commandes </a>
- 
- {% endblock %}
+        {% if order.envoyé %}
+            <span class="w3-tag w3-pale-green w3-border w3-border-green w3-padding-small">
+                Expédiée le {{ order.date_envoie|date:"d.m.Y" }}
+            </span>
+        {% else %}
+            <span class="w3-tag w3-pale-yellow w3-border w3-border-amber w3-padding-small">
+                En préparation
+            </span>
+        {% endif %}
+    </div>
+
+    <div class="w3-row-padding w3-padding-24">
+
+        <!-- ========== COLONNE GAUCHE : ARTICLES ========== -->
+        <div class="w3-col l7 m12 w3-margin-bottom">
+            <div class="w3-white w3-border w3-padding-large">
+
+                <p class="w3-small w3-wide w3-text-grey">ARTICLES</p>
+
+                {% for item in order_items %}
+                    <div class="w3-cell-row w3-border-bottom w3-padding-16">
+
+                        <!-- Miniature -->
+                        <div class="w3-cell w3-cell-middle" style="width:80px;">
+                            {% if item.produit.image_principale %}
+                                <a href="{% url 'detail' item.produit.id %}">
+                                    <img src="{{ item.produit.image_principale.url }}"
+                                         alt="{{ item.produit.nom }}"
+                                         style="width:64px; height:80px; object-fit:cover; display:block;">
+                                </a>
+                            {% endif %}
+                        </div>
+
+                        <!-- Nom, taille, couleur, quantité -->
+                        <div class="w3-cell w3-cell-middle">
+                            <span style="font-family:'Playfair Display', serif; font-size:17px;">
+                                {{ item.produit.nom|default:"Produit retiré de la boutique" }}
+                            </span><br>
+                            <span class="w3-small w3-text-grey">
+                                Taille {{ item.variante_produit.taille }} · {{ item.variante_produit.couleur }}<br>
+                                {{ item.quantité }} × {{ item.price }} CHF
+                            </span>
+                        </div>
+
+                        <!-- Sous-total de la ligne -->
+                        <div class="w3-cell w3-cell-middle w3-right-align" style="width:110px;">
+                            {{ item.sous_total }} CHF
+                        </div>
+
+                    </div>
+                {% endfor %}
+
+                <p class="w3-large w3-margin-top" style="margin-bottom:0;">
+                    Total payé
+                    <b class="w3-right">{{ total }} CHF</b>
+                </p>
+
+            </div>
+        </div>
+
+        <!-- ========== COLONNE DROITE : LIVRAISON ========== -->
+        <div class="w3-col l5 m12">
+            <div class="w3-sand w3-border w3-padding-large w3-margin-bottom">
+
+                <p class="w3-small w3-wide w3-text-grey">LIVRAISON</p>
+
+                <p style="margin:0; line-height:1.8;">
+                    <b>{{ order.nom_entier }}</b><br>
+                    {{ order.address|linebreaksbr }}<br>
+                    <span class="w3-text-grey">{{ order.email }}</span>
+                </p>
+
+            </div>
+
+            <a href="{% url 'mes_commandes' %}" class="w3-button w3-block w3-border w3-white w3-wide w3-small w3-padding-16">
+                ‹ RETOUR À MES COMMANDES
+            </a>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
