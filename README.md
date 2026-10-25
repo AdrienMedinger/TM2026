@@ -10,15 +10,15 @@ BloomWay est un site e-commerce de vente d'habits réalisé avec Django, dans le
 
 - Page détail produit: plusieurs images, choix de la taille, affichage du stock
 
-- Panier:ajouter, modifier la quantité, supprimer, affichage des produits dans le panier avec calcul du total pour chaque produit et sa quantité et un total pour tout le panier
+- Panier: ajouter, modifier la quantité, supprimer, affichage des produits dans le panier avec calcul du total pour chaque produit et sa quantité et un total pour tout le panier
 
-- Passage de la commande:information de livraison, facturation, paiement simulé (à cause d'un problème avec strip)
+- Passage de la commande: information de livraison, facturation, paiement simulé (à cause d'un problème avec strip)
 
 - Mail de confirmation à la fin de la commande
 
-- Historique des commandes passées avec un détail ma commande pour chacune d'entre elle
+- Historique des commandes passées avec un détail "ma_commande" pour chacune d'entre elle
 
-- tableau de bord pour l'administrateur commandes envoyées/pas envoyées
+- tableau de bord pour l'administrateur: commandes envoyées/pas envoyées
 
 
 ## Prérequis
