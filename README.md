@@ -23,8 +23,8 @@ BloomWay est un site e-commerce de vente d'habits réalisé avec Django, dans le
 
 ## Prérequis
 
-- **Python** (version)
-- **Django** (version)
+- **Python** (version 3.9.6 ou une plus récente)
+- **Django** (version 4.2.30)
 - **Environnement virtuel** (Venv)
 - **Pip** (normalement inclus dans python)
 - **Pillow** (pour ajouter des photos au site)
