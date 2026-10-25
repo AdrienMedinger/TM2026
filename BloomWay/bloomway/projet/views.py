@@ -6,13 +6,14 @@ from django.shortcuts import redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.conf import settings 
 from .models import Produit, Variante_produit, User, Panier, PanierProduit, Categorie, AdresseCommande, Order, OrderItem
-from .forms import ShippingForm, PaiementForm
+from .forms import ShippingForm, PaiementForm, ProfilForm
 from django.contrib import messages
 from django.db import transaction
 from django.db.models import F
 from django.contrib.admin.views.decorators import staff_member_required
 from django.views.decorators.http import require_POST
 from django.core.mail import send_mail
+
 
 
 
@@ -71,6 +72,22 @@ def login_page(request):
             else: 
                 message = 'Identifiants invalides'
     return render(request, 'projet/login.html', {'form': form, 'message': message})
+
+
+@login_required
+def modifier_profil(request):
+    if request.method == 'POST':
+       
+        form = ProfilForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Ton profil a bien été modifié.")
+            return redirect('profil')
+    else:
+        # formulaire pré-rempli avec les infos actuelles
+        form = ProfilForm(instance=request.user)
+
+    return render(request, 'projet/modifier_profil.html', {'form': form})
             
 
 def logout_page(request):

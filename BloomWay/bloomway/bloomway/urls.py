@@ -73,4 +73,6 @@ urlpatterns = [
 
     path('profil/', projet.views.profil, name='profil'),
 
+    path('profil/modifier/', projet.views.modifier_profil, name='modifier_profil'),
+
  ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

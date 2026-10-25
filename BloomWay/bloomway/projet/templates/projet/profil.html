@@ -6,10 +6,16 @@
     <!-- Carte d'identité -->
     <div class="w3-card-4 w3-white w3-round-large w3-margin-bottom">
         <div class="w3-container w3-black w3-center w3-padding-24 w3-round-large">
-            <svg width="70" height="70" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="8" r="4"/>
-                <path d="M4 21c0-4 4-7 8-7s8 3 8 7"/>
-            </svg>
+            {% if user.photo_de_profil %}
+                <!-- Photo de profil si l'utilisateur en a une -->
+                <img src="{{ user.photo_de_profil.url }}" alt="Photo de profil" class="w3-circle" style="width:90px; height:90px; object-fit:cover; border:2px solid white;">
+            {% else %}
+                <!-- Sinon, le petit bonhomme -->
+                <svg width="70" height="70" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="8" r="4"/>
+                    <path d="M4 21c0-4 4-7 8-7s8 3 8 7"/>
+                </svg>
+            {% endif %}
             <h2 style="font-family:'Playfair Display', serif; margin-bottom:0;">{{ user.username }}</h2>
         </div>
 
@@ -17,9 +23,12 @@
             <p><b>Nom d'utilisateur :</b> {{ user.username }}</p>
             <p><b>E-mail :</b> {{ user.email|default:"Non renseigné" }}</p>
             <p><b>Membre depuis :</b> {{ user.date_joined|date:"d.m.Y" }}</p>
+            <p><a href="{% url 'modifier_profil' %}" class="w3-button w3-black w3-round">Modifier mon profil</a></p>
+
         </div>
     </div>
 
+    
     <!-- Dernières commandes -->
     <div class="w3-card-4 w3-white w3-round-large w3-margin-bottom">
         <div class="w3-container w3-padding-16">

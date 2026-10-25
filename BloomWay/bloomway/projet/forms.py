@@ -37,3 +37,18 @@ class PaiementForm(forms.Form):
     carte_code_postal = forms.CharField(label="", widget= forms.TextInput(attrs={'class':'form-control', 'placeholder':'code postale'}),required=True)
     carte_pays = forms.CharField(label="", widget= forms.TextInput(attrs={'class':'form-control', 'placeholder':'pays de paiement'}),required=True)
 
+
+from django import forms
+from django.contrib.auth import get_user_model
+
+
+class ProfilForm(forms.ModelForm):
+    class Meta:
+        model = get_user_model()
+        fields = ['username', 'email', 'photo_de_profil', 'adresse']
+        labels = {
+            'username': "Nom d'utilisateur",
+            'email': 'E-mail',
+            'photo_de_profil': 'Photo de profil',
+            'adresse': 'Adresse',
+        }
